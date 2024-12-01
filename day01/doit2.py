@@ -11,7 +11,7 @@ def main(argv: list[str]):
     print(process(input_data))
 
 
-def parse_input(stream: Iterable[str]) -> tuple:
+def parse_input(stream: Iterable[str]) -> InputData:
     return tuple(parse_line(line) for line in stream)
 
 
