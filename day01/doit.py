@@ -1,6 +1,6 @@
 from typing import Iterable
 import sys
-from aoc_shared.utils import process_file, distance
+from aoc_shared.utils import distance, make_file_parser
 from day01_shared import parse_int_pairs
 
 Item = tuple[int, int]
@@ -8,7 +8,8 @@ InputData = Iterable[Item]
 
 
 def main(argv: list[str]):
-    print(process_file(parse_int_pairs, process, argv[1]))
+    parse_input = make_file_parser(parse_int_pairs)
+    print(process(parse_input(argv[1])))
 
 
 def process(input_data: InputData) -> int:

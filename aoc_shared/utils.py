@@ -1,4 +1,5 @@
 from typing import Iterable, TypeVar, Callable
+import functools
 
 T = TypeVar("T")
 
@@ -16,3 +17,12 @@ def process_file(parse_input: Callable[[Iterable[str]], T], calculate_result: Ca
         input_data = parse_input(file)
 
     return calculate_result(input_data)
+
+def parse_file(file_name: str, parse_lines: Callable[[Iterable[str]], T]) -> T:
+    with open(file_name, "r", encoding="utf-8") as file:
+        input_data = parse_lines(file)
+
+    return input_data
+
+def make_file_parser(content_parser: Callable[[Iterable[str]], T]) -> Callable[[str], T]:
+    return lambda file_name: parse_file(file_name, content_parser)
