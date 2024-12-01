@@ -1,0 +1,35 @@
+
+v<<A^>>A     <A
+vA^A         >A       ^A
+v<<A^>>A     <A               8
+A            A                1
+v<A<A^>>A    v<A              9
+A            A                1
+<Av>AA^A     ^>>A     ^^<<A   8
+v<A^>A       vA
+A            A
+<A>A         ^A       >>A
+v<A<A^>>A    v<A
+A            A
+A            A
+<Av>A^A      ^>A      vvvA
+
+
+
+<v<A>>^A    <A
+vA^A        >A        ^A
+<vA<AA>>^A  v<<A              10
+A           A                 1
+vA<^A>A     >^A               7
+A           A                 1
+vA^A        >A        <<^^A   4
+<vA>^A      vA
+A           A
+<A>A        ^A        >>A
+<v<A>A>^A   <vA
+A           A
+A           A
+vA<^A>A     >^A       vvvA
+
+243602
+237342
