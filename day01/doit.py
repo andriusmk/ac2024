@@ -1,21 +1,34 @@
-from typing import Iterable, Iterator
+from typing import Iterable
 import sys
+
+Item = tuple[int, int]
+InputData = Iterable[Item]
+
 
 def main(argv: list[str]):
     with open(argv[1], "r", encoding="utf-8") as f:
-        pairs = tuple(read_pairs(f))
+        input_data = parse_input(f)
+    print(process(input_data))
 
-    first, second = zip(*pairs)
+
+def parse_input(stream: Iterable[str]) -> tuple:
+    return tuple(parse_line(line) for line in stream)
+
+
+def process(input_data: InputData) -> int:
+    first, second = zip(*input_data)
     sorted_pairs = tuple(zip(sorted(first), sorted(second)))
-    print(sum(distance(*pair) for pair in sorted_pairs))
+    return sum(distance(*pair) for pair in sorted_pairs)
 
-def read_pairs(lines: Iterable[str]) -> Iterator[tuple[int, int]]:
-    for line in lines:
-        first, second = (int(l.strip()) for l in line.split(" ") if l)
-        yield first, second
+
+def parse_line(line: str) -> Item:
+    first, second = line.strip().split()
+    return int(first), int(second)
+
 
 def distance(x: int, y: int) -> int:
     return abs(x - y)
+
 
 if __name__ == "__main__":
     main(sys.argv)
