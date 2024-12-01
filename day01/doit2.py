@@ -23,8 +23,8 @@ def process(input_data: InputData) -> int:
 
 
 def parse_line(line: str) -> Item:
-    first, second = line.strip().split()
-    return int(first), int(second)
+    first, second = map(int, line.strip().split())
+    return first, second
 
 
 def score(reps: dict[int, int], value: int) -> int:
