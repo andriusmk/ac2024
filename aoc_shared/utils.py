@@ -26,3 +26,8 @@ def parse_file(file_name: str, parse_lines: Callable[[Iterable[str]], T]) -> T:
 
 def make_file_parser(content_parser: Callable[[Iterable[str]], T]) -> Callable[[str], T]:
     return lambda file_name: parse_file(file_name, content_parser)
+
+def pipe(first_value, *functions):
+    for function in functions:
+        first_value = function(first_value)
+    return first_value

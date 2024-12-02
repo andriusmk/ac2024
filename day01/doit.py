@@ -1,6 +1,6 @@
 from typing import Iterable
 import sys
-from aoc_shared.utils import distance, make_file_parser
+from aoc_shared.utils import distance, make_file_parser, pipe
 from day01_shared import parse_int_pairs
 
 Item = tuple[int, int]
@@ -9,7 +9,7 @@ InputData = Iterable[Item]
 
 def main(argv: list[str]):
     parse_input = make_file_parser(parse_int_pairs)
-    print(process(parse_input(argv[1])))
+    pipe(argv[1], parse_input, process, print)
 
 
 def process(input_data: InputData) -> int:
