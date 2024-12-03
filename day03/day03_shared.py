@@ -1,10 +1,11 @@
-from typing import Iterable, Iterator
+from typing import Iterator
+import operator
+import re
 
-Item = tuple[int, ...]
-InputData = tuple[Item, ...]
+mul_statement = re.compile(r"mul\((\d{1,3}+),(\d{1,3}+)\)")
 
-
-def parse_int_tuples(stream: Iterable[str]) -> InputData:
-    def parse_line(line: str) -> Item:
-        return tuple(map(int, line.strip().split()))
-    return tuple(parse_line(line) for line in stream)
+def extract_products(input_data: str) -> Iterator[int]:
+    matches = re.findall(mul_statement, input_data)
+    number_pairs = (map(int, pair) for pair in matches)
+    products = (operator.mul(*pair) for pair in number_pairs)
+    return products

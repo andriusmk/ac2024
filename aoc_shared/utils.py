@@ -38,3 +38,7 @@ def pair_adjacent(values: Iterable[T]) -> Iterator[tuple[T, T]]:
     while (value := next(iterator, None)) is not None:
         yield last_value, value
         last_value = value
+
+def read_file(name: str) -> str:
+    with open(name, "r", encoding="utf-8") as file:
+        return file.read()
