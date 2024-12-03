@@ -1,4 +1,4 @@
-from typing import Iterable, TypeVar, Callable
+from typing import Iterable, Iterator, TypeVar, Callable
 import functools
 
 T = TypeVar("T")
@@ -31,3 +31,10 @@ def pipe(first_value, *functions):
     for function in functions:
         first_value = function(first_value)
     return first_value
+
+def pair_adjacent(values: Iterable[T]) -> Iterator[tuple[T, T]]:
+    iterator = iter(values)
+    last_value = next(iterator)
+    while (value := next(iterator, None)) is not None:
+        yield last_value, value
+        last_value = value

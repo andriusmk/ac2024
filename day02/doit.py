@@ -1,7 +1,7 @@
 from typing import Iterable
 import sys
-from aoc_shared.utils import distance, make_file_parser, pipe
-from day02_shared import pair_adjacent, parse_int_tuples,  Item, InputData
+from aoc_shared.utils import distance, make_file_parser, pipe, pair_adjacent
+from day02_shared import parse_int_tuples,  Item, InputData
 
 def main(argv: list[str]):
     parse_input = make_file_parser(parse_int_tuples)
