@@ -29,8 +29,8 @@ def reduced_sets(report: Item) -> Iterable[Item]:
 
 def is_safe(report: Item) -> bool:
     pairs = tuple(pair_adjacent(report))
-    increasing = (x > y for x, y in pairs)
-    decreasing = (x < y for x, y in pairs)
+    increasing = (x < y for x, y in pairs)
+    decreasing = (x > y for x, y in pairs)
     safe_distance = (1 <= distance(x, y) <= 3 for x, y in pairs)
     return (all(increasing) or all(decreasing)) and all(safe_distance)
 
