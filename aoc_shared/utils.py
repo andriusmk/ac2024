@@ -42,3 +42,6 @@ def pair_adjacent(values: Iterable[T]) -> Iterator[tuple[T, T]]:
 def read_file(name: str) -> str:
     with open(name, "r", encoding="utf-8") as file:
         return file.read()
+
+def sum_vec(*vectors) -> tuple:
+    return tuple(map(sum, zip(*vectors)))

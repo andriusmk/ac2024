@@ -1,6 +1,6 @@
 from typing import Any, Iterable, Iterator
 import sys
-from aoc_shared.utils import distance, make_file_parser, pipe, pair_adjacent
+from aoc_shared.utils import sum_vec, make_file_parser, pipe
 
 Matrix = tuple[str, ...]
 Vector = tuple[int, int]
@@ -16,37 +16,6 @@ def main(argv: list[str]):
 def parser(lines: Iterable[str]) -> Matrix:
     return tuple(map(str.strip, lines))
 
-# def vertical(lines: Matrix) -> Iterable[str]:
-#     return ("".join(line) for line in zip(*lines))
-
-# def diagonal(lines: Matrix) -> Iterator[str]:
-#     word_len = len(word)
-#     width = len(lines[0])
-#     height = len(lines)
-#     print(f"{width=}")
-#     print(f"{height=}")
-
-#     def right(x0: int) -> Iterator[str]:
-#         print(f"{x0=}")
-#         y = x0
-#         for x in range(x0+1):
-#             print(x, y)
-#             if (0 <= x < width) and (height > y >= 0):
-#                 yield lines[x][y]
-#             y -= 1
-
-#     def left(x0: int) -> Iterator[str]:
-#         print(f"{x0=}")
-#         y = 0
-#         for x in range(x0+1):
-#             print(x, y)
-#             if (0 <= x < width) and (height > y >= 0):
-#                 yield lines[x][y]
-#             y += 1
-
-#     for x in range(width+height-1):
-#         yield "".join(right(x))       
-    
 
 def process(input_data: Matrix) -> Any:
     count = 0
@@ -69,9 +38,6 @@ def height(matrix: Matrix) -> int:
 
 def size(matrix: Matrix) -> Vector:
     return (width(matrix), height(matrix))
-
-def sum_vec(*vectors) -> tuple:
-    return tuple(map(sum, zip(*vectors)))
 
 def in_boundaries(size: Vector, position: Vector) -> bool:
     return all(x >= 0 for x in position) and all(p < s for p, s in zip(position, size))
