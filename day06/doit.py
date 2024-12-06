@@ -2,6 +2,7 @@ from typing import Any, Iterable, Iterator, Type, TypeVar, Callable
 import sys
 from dataclasses import dataclass, field
 import re
+import itertools
 from aoc_shared.utils import make_file_parser, pipe, sum_vec
 
 Vector2D = tuple[int, int]
@@ -45,31 +46,54 @@ def parser(lines: Iterator[str]) -> InputData:
     size = (len(line), row+1)
     return InputData(size, obstacles, position, vector)
 
-def walk(data: InputData) -> Iterator[Vector2D]:
-    if not all((data.vector, data.position)):
+def walk(data: InputData) -> Iterator[tuple[Vector2D, Vector2D]]:
+    if not data.position or not data.vector:
         return
-    visited = set()
     position = data.position
     vector = data.vector
-    visited.add(position)
+    yield position, vector
+
     while True:
         test_position = sum_vec(position, vector)
-        if not in_boundaries(data.field_size, position):
+        if not in_boundaries(data.field_size, test_position):
             break
         while test_position in data.obstacles:
             vector = rotate(vector)
             test_position = sum_vec(position, vector)
         # we are free to go
         position = test_position
-        visited.add(position)
-        yield position
+        yield position, vector
 
 def in_boundaries(size: Vector2D, position: Vector2D) -> bool:
     return all(x >= 0 for x in position) and all(p < s for p, s in zip(position, size))
 
+def is_loop(input_data: InputData) -> bool:
+    visited = set()
+    for state in walk(input_data):
+        if state in visited:
+            return True
+        visited.add(state)
+    return False
+
 def process(input_data: InputData) -> Any:
-    print(input_data)
-    return len(set(walk(input_data)))
+    free_walk = len(set(x for x, _ in walk(input_data)))
+    visited_positions = set()
+    loop_count = 0
+    plus_current_position = itertools.chain(
+        ((input_data.position, input_data.vector),),
+        walk(input_data)
+    )
+    for position, vector in plus_current_position:
+        print(position, vector)
+        visited_positions.add(position)
+        new_position = sum_vec(position, vector)
+        if new_position not in visited_positions and new_position not in input_data.obstacles:
+            new_data = InputData(input_data.field_size, input_data.obstacles.union((new_position),), position, vector)
+            if is_loop(new_data):
+                print("loop detected")
+                loop_count += 1
+
+    return f"{free_walk=}\n{loop_count=}"
 
 def rotate(value: Vector2D) -> Vector2D:
     x, y = value
