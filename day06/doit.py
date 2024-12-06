@@ -69,13 +69,17 @@ def in_boundaries(size: Vector2D, position: Vector2D) -> bool:
 
 def is_loop(input_data: InputData) -> bool:
     visited = set()
+    result = False
     for state in walk(input_data):
         if state in visited:
-            return True
+            result = True
+            break
         visited.add(state)
-    return False
+    return result
 
 def process(input_data: InputData) -> Any:
+    if input_data.position is None or input_data.vector is None:
+        return None
     free_walk = len(set(x for x, _ in walk(input_data)))
     visited_positions = set()
     loop_count = 0
@@ -84,13 +88,16 @@ def process(input_data: InputData) -> Any:
         walk(input_data)
     )
     for position, vector in plus_current_position:
-        print(position, vector)
         visited_positions.add(position)
         new_position = sum_vec(position, vector)
-        if new_position not in visited_positions and new_position not in input_data.obstacles:
-            new_data = InputData(input_data.field_size, input_data.obstacles.union((new_position),), position, vector)
+        if new_position in input_data.obstacles:
+            new_position = sum_vec(position, rotate(vector))
+            if new_position in input_data.obstacles:
+                continue
+        if new_position not in visited_positions:
+            new_obstacles = input_data.obstacles.union(((new_position),))
+            new_data = InputData(input_data.field_size, new_obstacles, position, vector)
             if is_loop(new_data):
-                print("loop detected")
                 loop_count += 1
 
     return f"{free_walk=}\n{loop_count=}"
