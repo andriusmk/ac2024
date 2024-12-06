@@ -43,5 +43,7 @@ def read_file(name: str) -> str:
     with open(name, "r", encoding="utf-8") as file:
         return file.read()
 
-def sum_vec(*vectors) -> tuple:
-    return tuple(map(sum, zip(*vectors)))
+def sum_vec(v1: tuple[int, int], v2: tuple[int, int]) -> tuple:
+    x1, y1 = v1
+    x2, y2 = v2
+    return x1+x2, y1+y2

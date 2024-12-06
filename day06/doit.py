@@ -1,3 +1,4 @@
+# import cProfile
 from typing import Any, Iterable, Iterator, Type, TypeVar, Callable
 import sys
 from dataclasses import dataclass, field
@@ -67,7 +68,10 @@ def walk(data: InputData) -> Iterator[tuple[Vector2D, Vector2D]]:
         yield position, vector
 
 def in_boundaries(size: Vector2D, position: Vector2D) -> bool:
-    return all(x >= 0 for x in position) and all(p < s for p, s in zip(position, size))
+    sx, sy = size
+    x, y = position
+    return 0 <= x < sx and 0 <= y < sy
+    # return all(x >= 0 for x in position) and all(p < s for p, s in zip(position, size))
 
 def is_loop(input_data: InputData) -> bool:
     visited = set()
@@ -112,3 +116,4 @@ def rotate(value: Vector2D) -> Vector2D:
 
 if __name__ == "__main__":
     main(sys.argv)
+    # cProfile.run('main(sys.argv)')
