@@ -90,7 +90,6 @@ def process(input_data: InputData) -> Any:
 
     print_progress_bar(0, total, prefix="Progress:", suffix="done", length=50)
     for step, (position, vector) in enumerate(walk_states, start=1):
-        print_progress_bar(step, total, prefix="Progress:", suffix="done", length=50)
         visited_positions.add(position)
         new_position = sum_vec(position, vector)
         if new_position in input_data.obstacles:
@@ -102,6 +101,7 @@ def process(input_data: InputData) -> Any:
             new_data = InputData(input_data.field_size, new_obstacles, position, vector)
             if is_loop(new_data):
                 loop_count += 1
+        print_progress_bar(step, total, prefix="Progress:", suffix="done", length=50)
     print()
 
     return f"{free_walk=}\n{loop_count=}"
