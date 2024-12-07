@@ -30,8 +30,6 @@ def calculate(ops: tuple[Operator, ...], values: tuple[int, ...]) -> Iterator[in
         for x in calculate(ops, rest):
             for operator in ops:
                 yield operator(x, v)
-        # for operator in ops:
-        #     yield from (operator(x, v) for x in calculate(ops, rest))
 
 def process(input_data: InputData) -> Any:
     result1 = 0
