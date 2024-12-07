@@ -32,6 +32,9 @@ def pipe(first_value, *functions):
         first_value = function(first_value)
     return first_value
 
+def pipe_f(*functions):
+    return lambda x: pipe(x, *functions)
+
 def pair_adjacent(values: Iterable[T]) -> Iterator[tuple[T, T]]:
     iterator = iter(values)
     last_value = next(iterator)
