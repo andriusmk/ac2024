@@ -21,26 +21,28 @@ def parser(lines: Iterator[str]) -> InputData:
         return result, operands
     return tuple(map(parse_line, lines))
 
-def calculate(ops: tuple[Operator, ...], values: tuple[int, ...]) -> Iterator[int]:
-    if len(values) == 1:
-        yield values[0]
-    else:
-        v = values[-1]
-        rest = values[:-1]
-        for x in calculate(ops, rest):
-            for operator in ops:
-                yield operator(x, v)
+def make_calculator(ops: tuple[Operator, ...]) -> Callable[[tuple[int, ...]], Iterator[int]]:
+    def calculate(values: tuple[int, ...]) -> Iterator[int]:
+        if len(values) == 1:
+            yield values[0]
+        else:
+            v = values[-1]
+            rest = values[:-1]
+            for x in calculate(rest):
+                for operator in ops:
+                    yield operator(x, v)
+    return calculate
 
 def process(input_data: InputData) -> Any:
     result1 = 0
     result2 = 0
-    ops1 = (op.add, op.mul)
-    ops2 = (op.add, op.mul, lambda x, y: int(str(x) + str(y)))
+    calculate1 = make_calculator((op.add, op.mul))
+    calculate2 = make_calculator((op.add, op.mul, lambda x, y: int(str(x) + str(y))))
     print_progress_bar(0, len(input_data), prefix="Progress:", suffix="done.", length=50)
 
     for step, (x, values) in enumerate(input_data, start=1):
-        result1 += x if (x in calculate(ops1, values)) else 0
-        result2 += x if (x in calculate(ops2, values)) else 0
+        result1 += x if (x in calculate1(values)) else 0
+        result2 += x if (x in calculate2(values)) else 0
         print_progress_bar(step, len(input_data), prefix="Progress:", suffix="done.", length=50)
 
     print()
