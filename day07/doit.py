@@ -33,19 +33,24 @@ def make_calculator(ops: tuple[Operator, ...]) -> Callable[[tuple[int, ...]], It
                     yield operator(x, v)
     return calculate
 
+
+def show_progress(step: int, total: int):
+    print_progress_bar(step, total, prefix="Progress:", suffix="done.", length=50)
+
+
 def process(input_data: InputData) -> Any:
     result1 = 0
     result2 = 0
     calculate1 = make_calculator((op.add, op.mul))
     calculate2 = make_calculator((op.add, op.mul, lambda x, y: int(str(x) + str(y))))
-    print_progress_bar(0, len(input_data), prefix="Progress:", suffix="done.", length=50)
+    data_len = len(input_data)
+    show_progress(0, data_len)
 
     for step, (x, values) in enumerate(input_data, start=1):
         result1 += x if (x in calculate1(values)) else 0
         result2 += x if (x in calculate2(values)) else 0
-        print_progress_bar(step, len(input_data), prefix="Progress:", suffix="done.", length=50)
+        show_progress(step, data_len)
 
-    print()
     return result1, result2
 
 
