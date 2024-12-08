@@ -2,6 +2,7 @@ from typing import Iterable, Iterator, TypeVar, Callable
 import functools
 
 T = TypeVar("T")
+Vector2D = tuple[int, int]
 
 def distance(x: int, y: int) -> int:
     return abs(x - y)
@@ -50,3 +51,8 @@ def sum_vec(v1: tuple[int, int], v2: tuple[int, int]) -> tuple:
     x1, y1 = v1
     x2, y2 = v2
     return x1+x2, y1+y2
+
+def in_boundaries(size: Vector2D, position: Vector2D) -> bool:
+    sx, sy = size
+    x, y = position
+    return 0 <= x < sx and 0 <= y < sy
