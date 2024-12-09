@@ -21,9 +21,8 @@ def show_progress(step: int, total: int):
 
 def process(input_data: str) -> Any:
     filesystem = tuple(decompress(input_data))
-    compacted = tuple(compact(filesystem))
-    # compacted = tuple(takewhile(lambda x: x is not None, filesystem))
-    return compacted, len(filesystem), len(compacted), checksum(compacted)
+    compacted = compact(filesystem)
+    return checksum(compacted)
 
 
 def checksum(fs: Iterable[int]) -> int:
@@ -32,8 +31,6 @@ def checksum(fs: Iterable[int]) -> int:
 
 def compact(fs: Sequence[int | None]) -> Iterator[int]:
     length = len(fs)
-    print("Input:", tuple(fs))
-    print("\n\n\n")
     read = ((idx, value) for idx, value in zip(count(length - 1, -1), reversed(fs)) if value is not None)
     end_idx = length
     for idx, value_in in enumerate(fs):
