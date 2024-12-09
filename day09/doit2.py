@@ -56,7 +56,7 @@ def compact2(fs: Iterable[int | None]) -> Iterator[int]:
         else:
             files.append((start, length, file_id))
     for idx, (start, length, file_id) in reversed(tuple(enumerate(files))):
-        for gap_idx, (gap_start, gap_length) in tuple(enumerate(gaps)):
+        for gap_idx, (gap_start, gap_length) in enumerate(gaps):
             if gap_start >= start:
                 break
             if gap_length >= length:
