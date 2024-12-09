@@ -21,7 +21,7 @@ def show_progress(step: int, total: int):
 
 
 def process(input_data: str) -> Any:
-    filesystem = tuple(decompress(input_data))
+    filesystem = decompress(input_data)
     compacted = compact2(filesystem)
     return checksum(compacted)
 
@@ -43,7 +43,7 @@ def compact(fs: Sequence[int | None]) -> Iterator[int]:
         else:
             yield value_in
 
-def compact2(fs: Sequence[int | None]) -> Iterator[int]:
+def compact2(fs: Iterable[int | None]) -> Iterator[int]:
     idx_blocks = enumerate(fs)
     gaps: list[tuple[int, int]] = []
     files: list[tuple[int, int, int]] = []
@@ -55,7 +55,7 @@ def compact2(fs: Sequence[int | None]) -> Iterator[int]:
             gaps.append((start, length))
         else:
             files.append((start, length, file_id))
-    for idx, (start, length, file_id) in tuple(reversed(tuple(enumerate(files)))):
+    for idx, (start, length, file_id) in reversed(tuple(enumerate(files))):
         for gap_idx, (gap_start, gap_length) in tuple(enumerate(gaps)):
             if gap_start >= start:
                 break
