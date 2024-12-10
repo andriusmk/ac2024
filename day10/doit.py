@@ -45,7 +45,8 @@ def process(terrain: tuple[str, ...]) -> Any:
         candidate_neighbours = ((nb, nb_height) for nb in all_neighbours(point) if (nb_height := get_height(nb)) == height + 1)
         rating = 0
         dest_set = set()
-        for nb_destinations, nb_rating in (destinations_reachable(*item) for item in candidate_neighbours):
+        for item in candidate_neighbours:
+            nb_destinations, nb_rating = destinations_reachable(*item)
             rating += nb_rating
             dest_set.update(nb_destinations)
 
