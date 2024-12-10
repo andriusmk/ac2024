@@ -29,7 +29,6 @@ def process(terrain: tuple[str, ...]) -> Any:
         (0, -1),
         (-1, 0)
     ]
-    reachability: dict[Vector2D, tuple[set[Vector2D], int]] = {}
     total_score = 0
     total_rating = 0
     def all_neighbours(point: Vector2D):
@@ -43,9 +42,6 @@ def process(terrain: tuple[str, ...]) -> Any:
         if height == 9:
             return ({point}, 1)
 
-        if (destinations := reachability.get(point)) is not None:
-            return destinations
-
         candidate_neighbours = ((nb, nb_height) for nb in all_neighbours(point) if (nb_height := get_height(nb)) == height + 1)
         rating = 0
         dest_set = set()
@@ -53,7 +49,6 @@ def process(terrain: tuple[str, ...]) -> Any:
             rating += nb_rating
             dest_set.update(nb_destinations)
 
-        reachability[point] = dest_set, rating
         return dest_set, rating
 
     for point, height in scan(terrain):
