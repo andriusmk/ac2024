@@ -23,16 +23,15 @@ def show_progress(step: int, total: int):
 
 def process(terrain: tuple[str, ...]) -> Any:
     field_size = (len(terrain[0]), len(terrain))
-    points = scan(terrain)
     neighbour_vectors = [
         (0, 1),
         (1, 0),
         (0, -1),
         (-1, 0)
     ]
-    reachability: dict[Vector2D, set[Vector2D]] = {}
+    reachability: dict[Vector2D, tuple[set[Vector2D], int]] = {}
     total_score = 0
-
+    total_rating = 0
     def all_neighbours(point: Vector2D):
         return (good_nb for n in neighbour_vectors if in_boundaries(field_size, good_nb := sum_vec(point, n)))
 
@@ -40,23 +39,30 @@ def process(terrain: tuple[str, ...]) -> Any:
         x, y = point
         return int(terrain[y][x])
 
-    def destinations_reachable(point: Vector2D, height: int) -> set[Vector2D]:
+    def destinations_reachable(point: Vector2D, height: int) -> tuple[set[Vector2D], int]:
         if height == 9:
-            return {point}
+            return ({point}, 1)
 
         if (destinations := reachability.get(point)) is not None:
             return destinations
 
         candidate_neighbours = ((nb, nb_height) for nb in all_neighbours(point) if (nb_height := get_height(nb)) == height + 1)
-        reachable = set(chain.from_iterable(destinations_reachable(*item) for item in candidate_neighbours))
-        reachability[point] = reachable
-        return reachable
+        rating = 0
+        dest_set = set()
+        for nb_destinations, nb_rating in (destinations_reachable(*item) for item in candidate_neighbours):
+            rating += nb_rating
+            dest_set.update(nb_destinations)
 
-    for point, height in points:
+        reachability[point] = dest_set, rating
+        return dest_set, rating
+
+    for point, height in scan(terrain):
         if height == 0:
-            total_score += len(destinations_reachable(point, height))
+            destinations = destinations_reachable(point, height)
+            total_score += len(destinations[0])
+            total_rating += destinations[1]
 
-    return total_score
+    return total_score, total_rating
 
 
 
