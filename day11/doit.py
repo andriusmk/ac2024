@@ -28,18 +28,23 @@ def process(steps: int, values: Iterable[int]) -> Any:
 
 @lru_cache(maxsize=None, typed=False)
 def length_after(steps: int, value: int) -> int:
-    if steps == 0:
-        result = 1
-    else:
+    def perform_step() -> int:
         next_steps = steps - 1
 
         if value == 0:
-            result = length_after(next_steps, 1)
-        elif ((decimals := decimal_digits(value)) & 1) == 0:
+            return length_after(next_steps, 1)
+        
+        if ((decimals := decimal_digits(value)) & 1) == 0:
             left, right = split_int(decimals >> 1, value)
-            result = length_after(next_steps, left) + length_after(next_steps, right)
-        else:
-            result = length_after(next_steps, value * 2024)
+            return length_after(next_steps, left) + length_after(next_steps, right)
+        
+        return length_after(next_steps, value * 2024)
+
+    result = 1
+    if steps > 0:
+        result = perform_step()
+
+    # some diagnostics may go there
     return result
 
 
