@@ -44,7 +44,7 @@ def length_after(steps: int, value: int) -> int:
     if steps > 0:
         result = perform_step()
 
-    # some diagnostics may go there
+    # some diagnostics may go here
     return result
 
 
