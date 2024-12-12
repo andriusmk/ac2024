@@ -40,10 +40,8 @@ def length_after(steps: int, value: int) -> int:
         
         return length_after(next_steps, value * 2024)
 
-    result = 1
-    if steps > 0:
-        result = perform_step()
-
+    result = perform_step() if steps > 0 else 1
+    
     # some diagnostics may go here
     return result
 
