@@ -48,7 +48,6 @@ def process(garden: tuple[str, ...]) -> Any:
         if starting_plot in visited_plots:
             return 0, 0
         
-        # print(starting_plot)
         visited_plots.add(starting_plot)
 
         my_neighbours = all_neighbours(starting_plot)
