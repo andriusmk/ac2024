@@ -123,6 +123,8 @@ def calculate_cost(walk_result: WalkResult) -> int:
          #   print(f"{seg1} -> {seg2}")
             if seg2[0] - seg1[0] > 1:
                 sides += 1
+            elif y > 0 and seg2 in walk_result.vfences:
+                sides += 2
         #print(f"{sides=}")
         total_sides += sides
 
