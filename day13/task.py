@@ -71,20 +71,23 @@ def play(conf: Config) -> Run | None:
     """Solve a game of with given configuration
     
     given:
+        ```
         x_a*a + x_b*b = X
         y_a*a + y_b*b = Y
+        ```
 
     solution:
+        ```
         k_x, k_y: k_x*x_a = k_y*y_a
-
-        k_x = lcm(x_a, y_a) / x_a
-        k_y = lcm(x_a, y_a) / y_a
-        b = (X*k_x - Y*k_y) / (x_b*k_x - y_b*k_y)
+        k_x = lcm(x_a, y_a) / x_a  
+        k_y = lcm(x_a, y_a) / y_a  
+        b = (X*k_x - Y*k_y) / (x_b*k_x - y_b*k_y)  
         a = (X - x_b*b) / x_a
-        
+        ```
+    
     Args:
         config (Config): game configuration
-
+    
     Returns:
         Run | None: input to win
     """
