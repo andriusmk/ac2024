@@ -4,29 +4,9 @@ from dataclasses import dataclass
 import re
 import math
 
+from aoc_shared.vector import Vector
 from aoc_shared.aoc import main
 from aoc_shared.utils import pipe_f
-
-@dataclass(slots=True)
-class Vector:
-    x: int
-    y: int
-
-    def __iadd__(self, other: Vector) -> Vector:
-        self.x += other.x
-        self.y += other.y
-        return self
-
-    def __isub__(self, other: Vector) -> Vector:
-        self.x -= other.x
-        self.y -= other.y
-        return self
-
-    def __add__(self, other: Vector) -> Vector:
-        return Vector(self.x + other.x, self.y + other.y)
-
-    def __sub__(self, other: Vector) -> Vector:
-        return Vector(self.x - other.x, self.y - other.y)
 
 @dataclass(frozen=True, slots=True)
 class Config:

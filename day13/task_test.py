@@ -20,41 +20,6 @@ Prize: X=18641, Y=10279
 """.strip()
     assert task.process(data)[0] == 480
 
-def test_vector_init():
-    v = task.Vector(1, 2)
-    assert v == task.Vector(1, 2)
-
-def test_vector_fields():
-    v = task.Vector(3, 4)
-    assert v.x == 3
-    assert v.y == 4
-
-def test_vector_iadd():
-    v = task.Vector(5, 6)
-    v += task.Vector(2, 3)
-    assert v == task.Vector(7, 9)
-
-def test_vector_add():
-    v1 = task.Vector(3, 5)
-    v2 = task.Vector(2, 3)
-    v = v1 + v2
-    assert v == task.Vector(5, 8)
-    assert v1 == task.Vector(3, 5)
-    assert v2 == task.Vector(2, 3)
-
-def test_vector_isub():
-    v = task.Vector(5, 6)
-    v -= task.Vector(2, 3)
-    assert v == task.Vector(3, 3)
-
-def test_vector_sub():
-    v1 = task.Vector(3, 5)
-    v2 = task.Vector(2, 3)
-    v = v1 - v2
-    assert v == task.Vector(1, 2)
-    assert v1 == task.Vector(3, 5)
-    assert v2 == task.Vector(2, 3)
-
 def test_parse():
     data = """
 Button A: X+94, Y+34
