@@ -21,3 +21,20 @@ class Vector:
 
     def __sub__(self, other: Vector) -> Vector:
         return Vector(self.x - other.x, self.y - other.y)
+
+    def __rmul__(self, value: int) -> Vector:
+        return Vector(value * self.x, value * self.y)
+    
+    def __imul__(self, value: int) -> Vector:
+        self.x *= value
+        self.y *= value
+        return self
+    
+    def add(self, other: Vector) -> None:
+        self += other
+    
+    def sub(self, other: Vector) -> None:
+        self -= other
+
+    def scale(self, value: int) -> None:
+        self *= value
