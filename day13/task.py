@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any, Iterable
 from dataclasses import dataclass
 import re
+import math
 
 from aoc_shared.aoc import main
 
@@ -28,14 +29,14 @@ class Vector:
 
 @dataclass(frozen=True, slots=True)
 class Config:
-    button_a: Vector
-    button_b: Vector
+    a: Vector
+    b: Vector
     prize: Vector
 
 @dataclass(frozen=True, slots=True)
 class Run:
-    a_cnt: int
-    b_cnt: int
+    a: int
+    b: int
 
 def parse(text: str) -> Iterable[Config]:
     configs = text.split("\n\n")
@@ -52,18 +53,54 @@ def make_vector(m: re.Match, group_x: int, group_y: int) -> Vector:
 
 
 def process(data: str) -> Any:
-    return 480
+    return sum(cost(result) for conf in parse(data)
+                if (result := play(conf)) is not None)
 
 
-def play(config: Config) -> Run | None:
+def play(conf: Config) -> Run | None:
+    """Solve a game of with given configuration
     
-    if config.button_b.x * 3 < config.button_a.x:
+    given:
+        x_a*a + x_b*b = X
+        y_a*a + y_b*b = Y
+
+    solution:
+        k_x, k_y: k_x*x_a = k_y*y_a
+
+        k_x = lcm(x_a, y_a) / x_a
+        k_y = lcm(x_a, y_a) / y_a
+        b = (X*k_x - Y*k_y) / (x_b*k_x - y_b*k_y)
+        a = (X - x_b*b) / x_a
+        
+    Args:
+        config (Config): game configuration
+
+    Returns:
+        Run | None: input to win
+    """
+    x_a = conf.a.x
+    x_b = conf.b.x
+    y_a = conf.a.y
+    y_b = conf.b.y
+    x = conf.prize.x
+    y = conf.prize.y
+
+    lcm = math.lcm(x_a, y_a)
+    k_x = lcm // conf.a.x
+    k_y = lcm // conf.a.y
+    b, mb = divmod(x*k_x - y*k_y, x_b*k_x - y_b*k_y)
+    if mb:
         return None
-    return None
+    
+    a, ma = divmod(x - x_b*b, x_a)
+    if ma:
+        return None
+    
+    return Run(a, b)
 
 
 def cost(run: Run) -> int:
-    return 3*run.a_cnt + run.b_cnt
+    return 3*run.a + run.b
 
 if __name__ == "__main__":
     main(process)

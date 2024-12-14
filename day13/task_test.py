@@ -87,12 +87,28 @@ def test_play_1():
         task.Vector(22, 67),
         task.Vector(8400, 5400)
     )
-    assert task.play(config) == task.Run(94, 34)
+    assert task.play(config) == task.Run(80, 40)
 
 def test_play_2():
     config = task.Config(
         task.Vector(26, 66),
         task.Vector(67, 21),
         task.Vector(12748, 12176)
+    )
+    assert task.play(config) is None
+
+def test_play_3():
+    config = task.Config(
+        task.Vector(17, 86),
+        task.Vector(84, 37),
+        task.Vector(7870, 6450)
+    )
+    assert task.play(config) == task.Run(38, 86)
+
+def test_play_4():
+    config = task.Config(
+        task.Vector(69, 23),
+        task.Vector(27, 71),
+        task.Vector(18641, 10279)
     )
     assert task.play(config) is None
