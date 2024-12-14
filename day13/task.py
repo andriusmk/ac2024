@@ -51,11 +51,21 @@ def parse(text: str) -> Iterable[Config]:
 def make_vector(m: re.Match, group_x: int, group_y: int) -> Vector:
     return Vector(int(m.group(group_x)), int(m.group(group_y)))
 
-
-def process(data: str) -> Any:
-    return sum(cost(result) for conf in parse(data)
+def sum_all_cost(parsed_input) -> int:
+    return sum(cost(result) for conf in parsed_input
                 if (result := play(conf)) is not None)
 
+def process(data: str) -> Any:
+    parsed_input = tuple(parse(data))
+    part_1 = sum_all_cost(parsed_input)
+
+    for conf in parsed_input:
+        conf.prize.x += 10000000000000
+        conf.prize.y += 10000000000000
+
+    part_2 = sum_all_cost(parsed_input)
+
+    return f"Part 1: {part_1}\nPart 2: {part_2}"
 
 def play(conf: Config) -> Run | None:
     """Solve a game of with given configuration
