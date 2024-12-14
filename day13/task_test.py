@@ -18,7 +18,7 @@ Button A: X+69, Y+23
 Button B: X+27, Y+71
 Prize: X=18641, Y=10279
 """.strip()
-    assert task.process(data) == 480
+    assert task.process(data)[0] == 480
 
 def test_vector_init():
     v = task.Vector(1, 2)

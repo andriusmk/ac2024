@@ -5,6 +5,7 @@ import re
 import math
 
 from aoc_shared.aoc import main
+from aoc_shared.utils import pipe_f
 
 @dataclass(slots=True)
 class Vector:
@@ -64,8 +65,13 @@ def process(data: str) -> Any:
         conf.prize.y += 10000000000000
 
     part_2 = sum_all_cost(parsed_input)
+    return part_1, part_2
 
+
+def format_output(result: tuple[int, int]) -> str:
+    part_1, part_2 = result
     return f"Part 1: {part_1}\nPart 2: {part_2}"
+
 
 def play(conf: Config) -> Run | None:
     """Solve a game of with given configuration
@@ -116,4 +122,4 @@ def cost(run: Run) -> int:
     return 3*run.a + run.b
 
 if __name__ == "__main__":
-    main(process)
+    main(pipe_f(process, format_output))
