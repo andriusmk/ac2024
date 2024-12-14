@@ -1,10 +1,16 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar
+import dataclasses as dc
 
 from .vector import Vector
 
 @dataclass(frozen=True)
 class FrozenVector:
-    v: Vector
+    v: Vector = dc.field(init=False)
+    x: InitVar[int]
+    y: InitVar[int]
+    def __post_init__(self, x: int, y: int):
+        object.__setattr__(self, "v", Vector(x, y))
+
 
 def test_vector_init():
     v = Vector(1, 2)
@@ -53,16 +59,16 @@ def test_vector_precedence():
     assert Vector(1, 2) + 7 * Vector(1, 1) == Vector(8, 9)
 
 def test_frozen_add():
-    v = FrozenVector(Vector(5, 7))
+    v = FrozenVector(5, 7)
     v.v.add(Vector(1, 1))
     assert v.v == Vector(6, 8)
 
 def test_frozen_sub():
-    v = FrozenVector(Vector(11, 13))
+    v = FrozenVector(11, 13)
     v.v.sub(Vector(2, 3))
     assert v.v == Vector(9, 10)
 
 def test_frozen_scale():
-    v = FrozenVector(Vector(7, 13))
+    v = FrozenVector(7, 13)
     v.v.scale(2)
     assert v.v == Vector(14, 26)
