@@ -1,5 +1,5 @@
 import task
-from task import Vector
+from task import FrozenVector
 
 def test_process():
     data = """
@@ -17,7 +17,7 @@ p=2,4 v=2,-3
 p=9,5 v=-3,-3
 """
     initial = task.parse(data)
-    assert task.calculate(100, Vector(11, 7), Vector(2, 2), initial) == 12
+    assert task.calculate(100, FrozenVector(11, 7), FrozenVector(2, 2), initial) == 12
 
 def test_parse():
     data = """

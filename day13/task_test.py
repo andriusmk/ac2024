@@ -33,14 +33,14 @@ Prize: X=12748, Y=12176
     result = tuple(task.parse(data))
     assert len(result) == 2
     assert result[0] == task.Config(
-        task.Vector(94, 34),
-        task.Vector(22, 67),
-        task.Vector(8400, 5400)
+        task.FrozenVector(94, 34),
+        task.FrozenVector(22, 67),
+        task.FrozenVector(8400, 5400)
     )
     assert result[1] == task.Config(
-        task.Vector(26, 66),
-        task.Vector(67, 21),
-        task.Vector(12748, 12176)
+        task.FrozenVector(26, 66),
+        task.FrozenVector(67, 21),
+        task.FrozenVector(12748, 12176)
     )
 
 def test_cost():
@@ -48,32 +48,32 @@ def test_cost():
 
 def test_play_1():
     config = task.Config(
-        task.Vector(94, 34),
-        task.Vector(22, 67),
-        task.Vector(8400, 5400)
+        task.FrozenVector(94, 34),
+        task.FrozenVector(22, 67),
+        task.FrozenVector(8400, 5400)
     )
     assert task.play(config) == task.Run(80, 40)
 
 def test_play_2():
     config = task.Config(
-        task.Vector(26, 66),
-        task.Vector(67, 21),
-        task.Vector(12748, 12176)
+        task.FrozenVector(26, 66),
+        task.FrozenVector(67, 21),
+        task.FrozenVector(12748, 12176)
     )
     assert task.play(config) is None
 
 def test_play_3():
     config = task.Config(
-        task.Vector(17, 86),
-        task.Vector(84, 37),
-        task.Vector(7870, 6450)
+        task.FrozenVector(17, 86),
+        task.FrozenVector(84, 37),
+        task.FrozenVector(7870, 6450)
     )
     assert task.play(config) == task.Run(38, 86)
 
 def test_play_4():
     config = task.Config(
-        task.Vector(69, 23),
-        task.Vector(27, 71),
-        task.Vector(18641, 10279)
+        task.FrozenVector(69, 23),
+        task.FrozenVector(27, 71),
+        task.FrozenVector(18641, 10279)
     )
     assert task.play(config) is None

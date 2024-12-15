@@ -9,21 +9,21 @@ import operator
 import re
 import math
 
-from aoc_shared.vector import Vector
+from aoc_shared.vector import FrozenVector
 from aoc_shared.aoc import main
 from aoc_shared.utils import pipe_f
 
 @dataclass(frozen=True, slots=True)
 class Robot:
-    position: Vector = dc.field(init=False)
-    velocity: Vector = dc.field(init=False)
+    position: FrozenVector = dc.field(init=False)
+    velocity: FrozenVector = dc.field(init=False)
     x: InitVar[int]
     y: InitVar[int]
     vx: InitVar[int]
     vy: InitVar[int]
     def __post_init__(self, x: int, y: int, vx: int, vy: int):
-        object.__setattr__(self, "position", Vector(x, y))
-        object.__setattr__(self, "velocity", Vector(vx, vy))
+        object.__setattr__(self, "position", FrozenVector(x, y))
+        object.__setattr__(self, "velocity", FrozenVector(vx, vy))
 
 
 def parse(text: str) -> Iterator[Robot]:
@@ -35,10 +35,10 @@ def parse(text: str) -> Iterator[Robot]:
 
 def process(data: str) -> Any:
     initial_state = parse(data)
-    part_1 = calculate(100, Vector(101, 103), Vector(2, 2), initial_state)
+    part_1 = calculate(100, FrozenVector(101, 103), FrozenVector(2, 2), initial_state)
     return part_1, 0
 
-def calculate(time: int, bbox: Vector, divider: Vector, initial: Iterable[Robot]):
+def calculate(time: int, bbox: FrozenVector, divider: FrozenVector, initial: Iterable[Robot]):
     init_pos = tuple(initial)
     final_positions = tuple(map(pipe_f(
         partial(moved, time),
@@ -57,7 +57,7 @@ def calculate(time: int, bbox: Vector, divider: Vector, initial: Iterable[Robot]
 
     return result
 
-def display(size: Vector, positions: Iterable[Vector]) -> None:
+def display(size: FrozenVector, positions: Iterable[FrozenVector]) -> None:
     rows: list[list[str]] = []
     for __ in range(size.y):
         rows.append(list(repeat(".", size.x)))
@@ -68,15 +68,15 @@ def display(size: Vector, positions: Iterable[Vector]) -> None:
     for row in rows:
         print("".join(row))
 
-def box(bbox: Vector, vector: Vector):
+def box(bbox: FrozenVector, vector: FrozenVector):
     x = vector.x % bbox.x
     y = vector.y % bbox.y
-    return Vector(x, y)
+    return FrozenVector(x, y)
 
-def moved(time: int, robot: Robot) -> Vector:
+def moved(time: int, robot: Robot) -> FrozenVector:
     return robot.position + time * robot.velocity
 
-def quadrant(bbox: Vector, dividers: Vector, position: Vector) -> tuple[int, int] | None:
+def quadrant(bbox: FrozenVector, dividers: FrozenVector, position: FrozenVector) -> tuple[int, int] | None:
     qx = segment(bbox.x, dividers.x, position.x)
     qy = segment(bbox.y, dividers.y, position.y)
     if qx is None or qy is None:
