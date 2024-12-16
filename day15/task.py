@@ -20,7 +20,6 @@ class State:
     walls: set[FrozenVector]
     boxes: set[FrozenVector]
     commands: str
-    
 
 def process(data: str) -> int:
     commands: dict[str, FrozenVector] = {
