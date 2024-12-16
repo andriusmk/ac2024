@@ -40,9 +40,10 @@ def process(data: str) -> int:
 
     def push(position: FrozenVector, direction: FrozenVector) -> bool:
         if boxes := can_push(position, direction):
-            for box in boxes:
-                state.boxes.discard(box)
-                state.boxes.add(box + direction)
+            to_push = set(boxes)
+            pushed = {box + direction for box in to_push}
+            state.boxes -= to_push
+            state.boxes |= pushed
             return True
         return False
 
