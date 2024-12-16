@@ -55,7 +55,7 @@ def process(data: str) -> int:
         boxes = test_poss & state.boxes
         pushables: tuple[Iterator[FrozenVector] | None, ...] = tuple(map(partial(can_push, direction=direction), boxes))
         if all(pushables):
-            return chain.from_iterable((*pushables, (position,))) # type: ignore
+            return chain(*pushables, (position,)) # type: ignore
         return None
            
 
