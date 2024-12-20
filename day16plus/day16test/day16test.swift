@@ -7,10 +7,19 @@
 
 import Testing
 
-struct day16test {
-
-    @Test func example() throws {
-        #expect(parse("asdf\ngasdf") == ["asdf", "gasdf"])
+@Suite struct MazeTest {
+    let maze = """
+    ####
+    #S.#
+    #.E#
+    ####
+    """
+    
+    @Test func validMapNotNil() throws {
+        #expect((parse(maze) != nil))
     }
-
+    
+    @Test func validContainsWalkables() throws {
+        #expect((parse(maze)?.walkable.isEmpty == false))
+    }
 }
