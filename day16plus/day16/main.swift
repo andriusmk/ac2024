@@ -7,9 +7,35 @@
 
 import Foundation
 
-func parse(map: String) -> [String] {
-    return map.split(whereSeparator: \.isNewline).map{ String($0) }
+struct Maze {
+    let walkable: Set<Vector2D>
+    let start: Vector2D
+    let finish: Vector2D
 }
 
-print("Hello, this is day\(16)")
+func parse(_ map: String) -> Maze? {
+    var walkable = Set<Vector2D>()
+    var start: Vector2D?
+    var finish: Vector2D?
+    
+    scan2d(map) { (x, y, c) in
+        switch c {
+        case "S":
+            start = Vector2D(x, y)
+        case "E":
+            finish = Vector2D(x, y)
+        case ".":
+            walkable.insert(Vector2D(x, y))
+        default:
+            ()
+        }
+    }
+    
+    guard let start else { return nil }
+    guard let finish else {return nil }
+
+    return Maze(walkable: walkable, start: start, finish: finish)
+}
+
+print(parse("####\n#S.#\n#.E#\n####"))
 
