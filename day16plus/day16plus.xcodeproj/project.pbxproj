@@ -9,12 +9,12 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		697659CE2D14875500A06823 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 16;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		697659DF2D148A1A00A06823 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -64,10 +64,21 @@
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		69765A022D1605BA00A06823 /* Exceptions for "day16" folder in "Copy Files" phase from "day16" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 697659CE2D14875500A06823 /* CopyFiles */;
+			membershipExceptions = (
+				input,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		697659D22D14875500A06823 /* day16 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				69765A022D1605BA00A06823 /* Exceptions for "day16" folder in "Copy Files" phase from "day16" target */,
 				697659F92D14995200A06823 /* Exceptions for "day16" folder in "day16test" target */,
 			);
 			path = day16;

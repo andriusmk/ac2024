@@ -9,6 +9,12 @@ import Foundation
 struct Vector2D : Hashable {
     let x: Int
     let y: Int
+    var rotatedCW: Vector2D {
+        Vector2D(-y, x)
+    }
+    var rotatedCCW: Vector2D {
+        Vector2D(y, -x)
+    }
     
     init(_ x: Int, _ y: Int) {
         self.x = x
@@ -18,6 +24,20 @@ struct Vector2D : Hashable {
 
 func +(_ v1: Vector2D, _ v2: Vector2D) -> Vector2D {
     return Vector2D(v1.x + v2.x, v1.y + v2.y)
+}
+
+prefix func -(_ v: Vector2D) -> Vector2D {
+    return Vector2D(-v.x, -v.y)
+}
+
+struct Maze {
+    let walkable: Set<Vector2D>
+    let start: Vector2D
+    let finish: Vector2D
+    
+    func isWalkable(_ pos: Vector2D) -> Bool {
+        return walkable.contains(pos)
+    }
 }
 
 func scan2d(_ data: String, with function: (Int, Int, Character) -> Void) {
