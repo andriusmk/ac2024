@@ -26,10 +26,11 @@ func parse(_ map: String) -> Maze? {
         }
     }
     
-    guard let start else { return nil }
-    guard let finish else {return nil }
-
-    return Maze(walkable: walkable, start: start, finish: finish)
+    if let start, let finish {
+        return Maze(walkable: walkable, start: start, finish: finish)
+    }
+    
+    return nil
 }
 
 struct State : Hashable {
@@ -109,20 +110,11 @@ func findCheapestPath(maze: Maze) -> (Int, Int)? {
         }
     }
     func findCheapestWay() -> Way? {
-        var result: Way?
-        for way in heads.values {
-            if result == nil || way.cost < result!.cost {
-                result = way
-            }
-        }
-        return result
+        return heads.values.min(by: {$0.cost < $1.cost})
     }
     
     while true {
         let currentState = cheapestWay.state
-//        print("pos:\(currentState.pos.x),\(currentState.pos.y) " +
-//              "dir:\(currentState.dir.x),\(currentState.dir.y) " +
-//              "dist:\(cheapestWay.cost)")
         if currentState.pos == maze.finish {
             break
         }
