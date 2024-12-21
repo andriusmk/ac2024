@@ -54,7 +54,7 @@ struct FindNeighbourTest {
 //    }
 }
 
-@Test func fullIntegration() throws {
+@Test func example1() throws {
     let maze = parse("""
     ###############
     #.......#....E#
@@ -72,5 +72,34 @@ struct FindNeighbourTest {
     #S..#.....#...#
     ###############
     """)
-    #expect(findCheapestPath(maze: maze!) == 7036)
+    let result = findCheapestPath(maze: maze!)
+    #expect(result != nil)
+    #expect(result!.0 == 7036)
+    #expect(result!.1 == 45)
+}
+
+@Test func example2() throws {
+    let maze = parse("""
+    #################
+    #...#...#...#..E#
+    #.#.#.#.#.#.#.#.#
+    #.#.#.#...#...#.#
+    #.#.#.#.###.#.#.#
+    #...#.#.#.....#.#
+    #.#.#.#.#.#####.#
+    #.#...#.#.#.....#
+    #.#.#####.#.###.#
+    #.#.#.......#...#
+    #.#.###.#####.###
+    #.#.#...#.....#.#
+    #.#.#.#####.###.#
+    #.#.#.........#.#
+    #.#.#.#########.#
+    #S#.............#
+    #################
+    """)
+    let result = findCheapestPath(maze: maze!)
+    #expect(result != nil)
+    #expect(result!.0 == 11048)
+    #expect(result!.1 == 64)
 }
