@@ -109,20 +109,17 @@ func findCheapestPath(maze: Maze) -> (Int, Int)? {
             }
         }
     }
-    func findCheapestWay() -> Way? {
-        return heads.values.min(by: {$0.cost < $1.cost})
-    }
     
-    while true {
+    while cheapestWay.state.pos != maze.finish {
         let currentState = cheapestWay.state
-        if currentState.pos == maze.finish {
-            break
-        }
         updateNeighbours(of: cheapestWay)
         visited.insert(currentState)
         heads.removeValue(forKey: currentState)
         
-        guard let newCheapestWay = findCheapestWay() else {return nil}
+        guard let newCheapestWay = heads.values.min(by: {$0.cost < $1.cost})
+        else {
+            return nil
+        }
         
         cheapestWay = newCheapestWay
     }
