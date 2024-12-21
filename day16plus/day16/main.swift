@@ -10,17 +10,6 @@ import Foundation
 struct State : Hashable {
     let pos: Vector2D
     let dir: Vector2D
-    var ahead: (State, Int) {
-        (State(pos: pos + dir, dir: dir), 1)
-    }
-    var left: (State, Int) {
-        let newDir = dir.rotatedCCW
-        return (State(pos: pos + newDir, dir: newDir), 1001)
-    }
-    var right: (State, Int) {
-        let newDir = dir.rotatedCW
-        return (State(pos: pos + newDir, dir: newDir), 1001)
-    }
 }
 
 func parse(_ map: String) -> Maze? {
