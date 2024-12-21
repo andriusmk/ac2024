@@ -88,21 +88,21 @@ func findNeighbour(maze: Maze, start: Way) -> Way? {
 
 func findCheapestPath(maze: Maze) -> (Int, Int)? {
     var visited = Set<State>()
-    var nodeCost = Dictionary<State, Way>()
+    var heads = Dictionary<State, Way>()
     let initialState = State(pos: maze.start, dir: Vector2D(1, 0))
     var cheapestWay = Way(state: initialState, cost: 0, track: [initialState.pos])
-    nodeCost[cheapestWay.state] = cheapestWay
+    heads[cheapestWay.state] = cheapestWay
     
     func updateNeighbours(of node: Way) {
         let exits = findExits(fromWay: node, in: maze)
         for ex in exits {
             if let neighbour = findNeighbour(maze: maze, start: ex) {
                 if visited.contains(neighbour.state) == false {
-                    let way = nodeCost[neighbour.state]
+                    let way = heads[neighbour.state]
                     if way == nil || way!.cost > neighbour.cost {
-                        nodeCost[neighbour.state] = neighbour
+                        heads[neighbour.state] = neighbour
                     } else if way!.cost == neighbour.cost {
-                        nodeCost[neighbour.state] = Way(state: neighbour.state, cost: neighbour.cost, track: way!.track.union(neighbour.track))
+                        heads[neighbour.state] = Way(state: neighbour.state, cost: neighbour.cost, track: way!.track.union(neighbour.track))
                     }
                 }
             }
@@ -110,7 +110,7 @@ func findCheapestPath(maze: Maze) -> (Int, Int)? {
     }
     func findCheapestWay() -> Way? {
         var result: Way?
-        for way in nodeCost.values {
+        for way in heads.values {
             if result == nil || way.cost < result!.cost {
                 result = way
             }
@@ -128,7 +128,7 @@ func findCheapestPath(maze: Maze) -> (Int, Int)? {
         }
         updateNeighbours(of: cheapestWay)
         visited.insert(currentState)
-        nodeCost.removeValue(forKey: currentState)
+        heads.removeValue(forKey: currentState)
         
         guard let newCheapestWay = findCheapestWay() else {return nil}
         
