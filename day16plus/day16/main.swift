@@ -48,64 +48,97 @@ func parse(_ map: String) -> Maze? {
     return Maze(walkable: walkable, start: start, finish: finish)
 }
 
-func findNeighbour(maze: Maze, node: State) -> (State, Int)? {
-    var state = node
-    var cost = 0
+struct Way {
+    let state: State
+    let cost: Int
+}
+
+func findExits(fromState state: State, in maze: Maze) -> [Way] {
+    let testWays = [
+        Way(state: state, cost: 0),
+        Way(state: State(pos: state.pos, dir: state.dir.rotatedCCW), cost: 1000),
+        Way(state: State(pos: state.pos, dir: state.dir.rotatedCW), cost: 1000)
+    ]
+    
+    return testWays.filter({maze.isWalkable($0.state.pos + $0.state.dir)})
+}
+
+func findExits(fromWay way: Way, in maze: Maze) -> [Way] {
+    return findExits(fromState: way.state, in: maze).map{Way(state: $0.state, cost: $0.cost + way.cost)}
+}
+
+func findNeighbour(maze: Maze, start: Way) -> Way? {
+    var state = start.state
+    var cost = start.cost
+    
     while true {
-        let next_states = [state.ahead, state.left, state.right].filter{maze.isWalkable($0.0.pos)}
-        
-        if next_states.isEmpty {
-            return nil
-        }
-        
-        if next_states.count > 1 {
-            return (state, cost)
-        }
-        // Not a dead end, not a node
-        let (newState, newCost) = next_states[0]
-        state = newState
-        cost += newCost
+        state = State(pos: state.pos + state.dir, dir: state.dir)
+        cost += 1
         
         if state.pos == maze.finish {
-            return (state, cost)
+            return Way(state: state, cost: cost)
         }
+        
+        let exits = findExits(fromState: state, in: maze)
+        if exits.isEmpty {
+            return nil
+        }
+        if exits.count > 1 {
+            return Way(state: state, cost: cost)
+        }
+        
+        let wayToGo = exits[0]
+        state = wayToGo.state
+        cost += wayToGo.cost
     }
 }
 
 func findCheapestPath(maze: Maze) -> Int? {
     var visited = Set<State>()
     var nodeCost = Dictionary<State, Int>()
-    var result: Int?
-    func visit(node: State) {
-        if visited.contains(node) {
-            return
-        }
-        visited.insert(node)
-        let cost = nodeCost[node]!
-        if node.pos == maze.finish {
-            let res = result ?? cost
-            result = min(res, cost)
-            return
-        }
-        let nextSteps = [node.ahead, node.left, node.right].filter({maze.isWalkable($0.0.pos)})
-        let neighbours: [(State, Int)] = nextSteps.map({(step, initialCost) in
-            guard let (neighbour, cost) = findNeighbour(maze: maze, node: step) else {return nil}
-            return (neighbour, initialCost + cost)
-        }).filter({$0 != nil}).map({$0!})
-        for (neighbour, relCost) in neighbours {
-            let absCost = cost + relCost
-            let storedCost = nodeCost[neighbour] ?? absCost
-            nodeCost[neighbour] = min(absCost, storedCost)
-        }
-        for neighbour in neighbours.map({$0.0}).sorted(by: {nodeCost[$0]! < nodeCost[$1]!}) {
-            visit(node: neighbour)
+    let initialState = State(pos: maze.start, dir: Vector2D(1, 0))
+    var cheapestWay = Way(state: initialState, cost: 0)
+    nodeCost[cheapestWay.state] = 0
+    
+    func updateNeighbours(of node: Way) {
+        let exits = findExits(fromWay: node, in: maze)
+        for ex in exits {
+            if let neighbour = findNeighbour(maze: maze, start: ex) {
+                if visited.contains(neighbour.state) == false {
+                    let cost = nodeCost[neighbour.state] ?? neighbour.cost
+                    nodeCost[neighbour.state] = min(cost, neighbour.cost)
+                }
+            }
         }
     }
-    let initialState = State(pos: maze.start, dir: Vector2D(1, 0))
-    nodeCost[initialState] = 0
-    visit(node: initialState)
+    func findCheapestWay() -> Way? {
+        var result: Way?
+        for (state, cost) in nodeCost {
+            if result == nil || cost < result!.cost {
+                result = Way(state: state, cost: cost)
+            }
+        }
+        return result
+    }
     
-    return result
+    while true {
+        let currentState = cheapestWay.state
+//        print("pos:\(currentState.pos.x),\(currentState.pos.y) " +
+//              "dir:\(currentState.dir.x),\(currentState.dir.y) " +
+//              "dist:\(cheapestWay.cost)")
+        if currentState.pos == maze.finish {
+            break
+        }
+        updateNeighbours(of: cheapestWay)
+        visited.insert(currentState)
+        nodeCost.removeValue(forKey: currentState)
+        
+        guard let newCheapestWay = findCheapestWay() else {return nil}
+        
+        cheapestWay = newCheapestWay
+    }
+    
+    return cheapestWay.cost
 }
 
 
