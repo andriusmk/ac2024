@@ -58,6 +58,7 @@
 		697659FF2D14A78F00A06823 /* Exceptions for "lib" folder in "day16test" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				dijkstra.swift,
 				utils.swift,
 			);
 			target = 697659F02D1498A200A06823 /* day16test */;

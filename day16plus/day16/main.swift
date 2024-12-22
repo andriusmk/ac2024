@@ -37,29 +37,33 @@ struct State : Hashable {
     let dir: Vector2D
 }
 
-struct Way {
-    let state: State
-    let cost: Int
+struct Way : GraphEdge {
+    let target: State
+    let distance: Int
     let track: Set<Vector2D>
+    
+    func merge(with other: Way) -> Way {
+        Way(target: target, distance: distance, track: track.union(other.track))
+    }
 }
 
 func findExits(fromState state: State, in maze: Maze) -> [Way] {
     let testWays = [
-        Way(state: state, cost: 0, track: [state.pos]),
-        Way(state: State(pos: state.pos, dir: state.dir.rotatedCCW), cost: 1000, track: [state.pos]),
-        Way(state: State(pos: state.pos, dir: state.dir.rotatedCW), cost: 1000, track: [state.pos])
+        Way(target: state, distance: 0, track: [state.pos]),
+        Way(target: State(pos: state.pos, dir: state.dir.rotatedCCW), distance: 1000, track: [state.pos]),
+        Way(target: State(pos: state.pos, dir: state.dir.rotatedCW), distance: 1000, track: [state.pos])
     ]
     
-    return testWays.filter({maze.isWalkable($0.state.pos + $0.state.dir)})
+    return testWays.filter({maze.isWalkable($0.target.pos + $0.target.dir)})
 }
 
 func findExits(fromWay way: Way, in maze: Maze) -> [Way] {
-    return findExits(fromState: way.state, in: maze).map{Way(state: $0.state, cost: $0.cost + way.cost, track: way.track)}
+    return findExits(fromState: way.target, in: maze).map{Way(target: $0.target, distance: $0.distance + way.distance, track: way.track)}
 }
 
 func findNeighbour(maze: Maze, start: Way) -> Way? {
-    var state = start.state
-    var cost = start.cost
+    var state = start.target
+    var cost = start.distance
     var track: [Vector2D] = []
     
     while true {
@@ -73,45 +77,46 @@ func findNeighbour(maze: Maze, start: Way) -> Way? {
         }
         
         if exits.count > 1 || state.pos == maze.finish {
-            return Way(state: state, cost: cost, track: start.track.union(track))
+            return Way(target: state, distance: cost, track: start.track.union(track))
         }
         
         let wayToGo = exits[0]
-        state = wayToGo.state
-        cost += wayToGo.cost
+        state = wayToGo.target
+        cost += wayToGo.distance
     }
 }
 
 func findCheapestPath(maze: Maze) -> (Int, Int)? {
+    let initialState = State(pos: maze.start, dir: Vector2D(1, 0))
+    
     var visited = Set<State>()
     var heads = Dictionary<State, Way>()
-    let initialState = State(pos: maze.start, dir: Vector2D(1, 0))
-    var cheapestWay = Way(state: initialState, cost: 0, track: [initialState.pos])
-    heads[cheapestWay.state] = cheapestWay
+    var cheapestWay = Way(target: initialState, distance: 0, track: [initialState.pos])
+    heads[cheapestWay.target] = cheapestWay
     
     func updateNeighbours(of node: Way) {
         let exits = findExits(fromWay: node, in: maze)
         for ex in exits {
             if let neighbour = findNeighbour(maze: maze, start: ex) {
-                if visited.contains(neighbour.state) == false {
-                    let way = heads[neighbour.state]
-                    if way == nil || way!.cost > neighbour.cost {
-                        heads[neighbour.state] = neighbour
-                    } else if way!.cost == neighbour.cost {
-                        heads[neighbour.state] = Way(state: neighbour.state, cost: neighbour.cost, track: way!.track.union(neighbour.track))
+                if visited.contains(neighbour.target) == false {
+                    let way = heads[neighbour.target]
+                    if way == nil || way!.distance > neighbour.distance {
+                        heads[neighbour.target] = neighbour
+                    } else if way!.distance == neighbour.distance {
+                        heads[neighbour.target] = Way(target: neighbour.target, distance: neighbour.distance, track: way!.track.union(neighbour.track))
                     }
                 }
             }
         }
     }
     
-    while cheapestWay.state.pos != maze.finish {
-        let currentState = cheapestWay.state
+    while cheapestWay.target.pos != maze.finish {
+        let currentState = cheapestWay.target
         updateNeighbours(of: cheapestWay)
         visited.insert(currentState)
         heads.removeValue(forKey: currentState)
         
-        guard let newCheapestWay = heads.values.min(by: {$0.cost < $1.cost})
+        guard let newCheapestWay = heads.values.min(by: {$0.distance < $1.distance})
         else {
             return nil
         }
@@ -119,7 +124,7 @@ func findCheapestPath(maze: Maze) -> (Int, Int)? {
         cheapestWay = newCheapestWay
     }
     
-    return (cheapestWay.cost, cheapestWay.track.count)
+    return (cheapestWay.distance, cheapestWay.track.count)
 }
 
 
