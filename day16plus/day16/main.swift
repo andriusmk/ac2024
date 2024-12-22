@@ -8,7 +8,7 @@
 import Foundation
 
 func parse(_ map: String) -> Maze? {
-    var walkable = Set<Vector2D>()
+    var obstacles = Set<Vector2D>()
     var start: Vector2D?
     var finish: Vector2D?
     
@@ -18,16 +18,15 @@ func parse(_ map: String) -> Maze? {
             start = Vector2D(x, y)
         case "E":
             finish = Vector2D(x, y)
-            fallthrough
-        case ".":
-            walkable.insert(Vector2D(x, y))
+        case "#":
+            obstacles.insert(Vector2D(x, y))
         default:
             ()
         }
     }
     
     if let start, let finish {
-        return Maze(walkable: walkable, start: start, finish: finish)
+        return Maze(obstacles: obstacles, start: start, finish: finish)
     }
     
     return nil

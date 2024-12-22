@@ -31,12 +31,12 @@ prefix func -(_ v: Vector2D) -> Vector2D {
 }
 
 struct Maze {
-    let walkable: Set<Vector2D>
+    let obstacles: Set<Vector2D>
     let start: Vector2D
     let finish: Vector2D
     
     func isWalkable(_ pos: Vector2D) -> Bool {
-        return walkable.contains(pos)
+        return obstacles.contains(pos) == false
     }
 }
 
