@@ -62,26 +62,18 @@ func findNeighbour(maze: Maze, start: Way) -> Way? {
     var cost = start.cost
     var track: [Vector2D] = []
     
-    func makeWay() -> Way {
-        Way(state: state, cost: cost, track: start.track.union(track))
-    }
-    
     while true {
         state = State(pos: state.pos + state.dir, dir: state.dir)
         cost += 1
         track.append(state.pos)
-        
-        if state.pos == maze.finish {
-            return makeWay()
-        }
         
         let exits = findExits(fromState: state, in: maze)
         if exits.isEmpty {
             return nil
         }
         
-        if exits.count > 1 {
-            return makeWay()
+        if exits.count > 1 || state.pos == maze.finish {
+            return Way(state: state, cost: cost, track: start.track.union(track))
         }
         
         let wayToGo = exits[0]
