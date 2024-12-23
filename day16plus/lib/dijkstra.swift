@@ -27,15 +27,15 @@ struct NullTrace<E : GraphEdge> : GraphTrace {
     }
 }
 
-func dijkstra<T : GraphTrace>(with getAdjacent: @escaping (T.Edge.Vertex) -> [T.Edge],
+func dijkstra<T : GraphTrace>(with getAdjacent: (T.Edge.Vertex) -> [T.Edge],
                          start: T.Edge.Vertex,
-                         isEnd: @escaping (T.Edge.Vertex) -> Bool,
-                         trace: T) -> AnyIterator<(Int, T)> {
+                         isEnd: (T.Edge.Vertex) -> Bool,
+                         trace: T) -> (Int, T)? {
     var heads = [start: (0, trace)] // Dictionary<T.Edge.Vertex, (Int, T)>()
     var visited = Set<T.Edge.Vertex>()
     
     if isEnd(start) {
-        return AnyIterator([(0, trace)].makeIterator())
+        return (0, trace)
     }
     
     func updateAdjacent(_ edge: T.Edge, _ distance: Int, _ trace: T) {
@@ -66,6 +66,6 @@ func dijkstra<T : GraphTrace>(with getAdjacent: @escaping (T.Edge.Vertex) -> [T.
         return nil
     }
     
-    return AnyIterator(nextResult)
+    return nextResult()
 }
 
