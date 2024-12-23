@@ -27,50 +27,45 @@ struct NullTrace<E : GraphEdge> : GraphTrace {
     }
 }
 
-func dijkstra<T : GraphTrace>(with getAdjacent: (T.Edge.Vertex) -> [T.Edge],
+func dijkstra<T : GraphTrace>(with getAdjacent: @escaping (T.Edge.Vertex) -> [T.Edge],
                          start: T.Edge.Vertex,
-                         isEnd: (T.Edge.Vertex) -> Bool,
-                         trace: T) -> (Int, T)? {
-    var heads = Dictionary<T.Edge.Vertex, (Int, T)>()
-    var current = start
-    var currentDistance = 0
+                         isEnd: @escaping (T.Edge.Vertex) -> Bool,
+                         trace: T) -> AnyIterator<(Int, T)> {
+    var heads = [start: (0, trace)] // Dictionary<T.Edge.Vertex, (Int, T)>()
     var visited = Set<T.Edge.Vertex>()
-    var currentTrace = trace
     
-    func updateAdjacent(_ edge: T.Edge, trace: T) {
-        let distance = currentDistance + edge.distance
+    if isEnd(start) {
+        return AnyIterator([(0, trace)].makeIterator())
+    }
+    
+    func updateAdjacent(_ edge: T.Edge, _ distance: Int, _ trace: T) {
+        let targetDistance = distance + edge.distance
         let newTrace = trace.append(edge)
         if let (storedDistance, storedTrace) = heads[edge.target] {
-            if storedDistance > distance {
-                heads[edge.target] = (distance, newTrace)
-            } else if storedDistance == distance {
-                heads[edge.target] = (distance, storedTrace.merge(with: newTrace))
+            if storedDistance > targetDistance {
+                heads[edge.target] = (targetDistance, newTrace)
+            } else if storedDistance == targetDistance {
+                heads[edge.target] = (targetDistance, storedTrace.merge(with: newTrace))
             }
         } else {
-            heads[edge.target] = (distance, newTrace)
+            heads[edge.target] = (targetDistance, newTrace)
         }
     }
     
-    while isEnd(current) == false {
-        for edge in getAdjacent(current).filter({!visited.contains($0.target)}) {
-            updateAdjacent(edge, trace: currentTrace)
+    func nextResult() -> (Int, T)? {
+        while let (vertex, (minDistance, headTrace)) = heads.min(by: { $0.1.0 < $1.1.0 }) {
+            for edge in getAdjacent(vertex).filter({!visited.contains($0.target)}) {
+                updateAdjacent(edge, minDistance, headTrace)
+            }
+            visited.insert(vertex)
+            heads.removeValue(forKey: vertex)
+            if isEnd(vertex) {
+                return (minDistance, headTrace)
+            }
         }
-        visited.insert(current)
-        heads.removeValue(forKey: current)
-        guard let (vertex, (minDistance, headTrace)) = heads.min(by: { $0.1.0 < $1.1.0 })
-        else {
-            return nil
-        }
-        current = vertex
-        currentDistance = minDistance
-        currentTrace = headTrace
+        return nil
     }
     
-    return (currentDistance, currentTrace)
+    return AnyIterator(nextResult)
 }
 
-func dijkstra<E : GraphEdge>(with getAdjacent: (E.Vertex) -> [E],
-                             start: E.Vertex,
-                             isEnd: (E.Vertex) -> Bool) -> Int? {
-    dijkstra(with: getAdjacent, start: start, isEnd: isEnd, trace: NullTrace<E>())?.0
-}

@@ -96,18 +96,16 @@ func findNeighbours(maze: Maze, start: State) -> [Way] {
     return result
 }
 
-func findCheapestPath(maze: Maze) -> (Int, Int)? {
+func findCheapestPaths(maze: Maze) -> [(Int, Int)] {
     let initialState = State(pos: maze.start, dir: Vector2D(1, 0))
-    guard let (distance, trace) = dijkstra(
+    return dijkstra(
         with: { findNeighbours(maze: maze, start: $0)},
         start: initialState,
         isEnd: { $0.pos == maze.finish},
-        trace: Trace(trace: Set()) )
-    else {
-        return nil
-    }
-    
-    return (distance, trace.trace.count)
+        trace: Trace(trace: Set()) ).lazy.map({($0, $1.trace.count)})
 }
 
-print(findCheapestPath(maze: parse(try String(contentsOfFile: "input", encoding: .ascii))!) ?? (-1, -1))
+let results = findCheapestPaths(maze: parse(try String(contentsOfFile: "input", encoding: .ascii))!)
+
+results.forEach({print($0)})
+
