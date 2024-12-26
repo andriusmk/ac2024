@@ -54,6 +54,12 @@ struct Trace : GraphTrace {
     }
 }
 
+extension Trace {
+    init() {
+        trace = []
+    }
+}
+
 func findExits(fromState state: State, in maze: Maze) -> [Way] {
     let testWays = [
         Way(target: state, distance: 0, trace: [state.pos]),
@@ -98,11 +104,10 @@ func findNeighbours(maze: Maze, start: State) -> [Way] {
 
 func findCheapestPath(maze: Maze) -> (Int, Int)? {
     let initialState = State(pos: maze.start, dir: Vector2D(1, 0))
-    if let (distance, trace) = dijkstra(
+    if let (distance, trace): (Int, Trace) = dijkstra(
         with: { findNeighbours(maze: maze, start: $0)},
         start: initialState,
-        isEnd: { $0.pos == maze.finish},
-        trace: Trace(trace: Set()) ) {
+        isEnd: { $0.pos == maze.finish}) {
         
         return (distance, trace.trace.count)
     }

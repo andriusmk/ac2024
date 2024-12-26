@@ -16,6 +16,7 @@ protocol GraphTrace {
     associatedtype Edge : GraphEdge
     func append(_ edge: Edge) -> Self
     func merge(with: Self) -> Self
+    init()
 }
 
 struct NullTrace<E : GraphEdge> : GraphTrace {
@@ -30,7 +31,7 @@ struct NullTrace<E : GraphEdge> : GraphTrace {
 func dijkstra<T : GraphTrace>(with getAdjacent: (T.Edge.Vertex) -> [T.Edge],
                          start: T.Edge.Vertex,
                          isEnd: (T.Edge.Vertex) -> Bool,
-                         trace: T) -> (Int, T)? {
+                         trace: T = T()) -> (Int, T)? {
     var heads = [start: (0, trace)] // Dictionary<T.Edge.Vertex, (Int, T)>()
     var visited = Set<T.Edge.Vertex>()
     
@@ -68,4 +69,3 @@ func dijkstra<T : GraphTrace>(with getAdjacent: (T.Edge.Vertex) -> [T.Edge],
     
     return nextResult()
 }
-
