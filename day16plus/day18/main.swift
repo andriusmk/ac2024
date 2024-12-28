@@ -65,6 +65,12 @@ struct Crawler {
             distances.removeValue(forKey: pos)
         }
     }
+
+    mutating func reset() {
+        distances.removeAll(keepingCapacity: true)
+        distances[Vector2D(0, 0)] = 0
+        visited.removeAll(keepingCapacity: true)
+    }
 }
 
 let obstacles = parse(try String(contentsOfFile: "input", encoding: .ascii))
@@ -72,3 +78,12 @@ var maze = FrameMaze(size: Vector2D(71, 71), obstacles: Set(obstacles.prefix(102
 
 var crawler = Crawler(maze)
 print(crawler.minDistance() ?? -1)
+
+for obstacle in obstacles.dropFirst(1024) {
+    crawler.reset()
+    crawler.maze.obstacles.insert(obstacle)
+    if crawler.minDistance() == nil {
+        print([obstacle.x, obstacle.y].map({String($0)}).joined(separator: ","))
+        break
+    }
+}
