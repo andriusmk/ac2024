@@ -27,7 +27,6 @@ struct ToyCpu {
     var state: State
     var program: [Int]
     var progOutput: [Int] = []
-    var seenStates = Set<State>()
     
     init(_ a: Int, _ b: Int, _ c: Int, _ prog: [Int]) {
         state = State(a, b, c)
@@ -50,10 +49,6 @@ struct ToyCpu {
     }
     
     mutating func readInstruction() throws -> (Int, Int)? {
-        if seenStates.contains(state) {
-            throw CpuError.loopDetected
-        }
-        seenStates.insert(state)
         if state.iptr < program.count - 1 {
             let result = (program[state.iptr], program[state.iptr + 1])
             state.iptr += 2
@@ -116,9 +111,43 @@ struct ToyCpu {
     }
 
     mutating func reset() {
-        progOutput.removeAll(keepingCapacity: true)
         state = State(0, 0, 0)
-        seenStates.removeAll(keepingCapacity: true)
+        progOutput.removeAll(keepingCapacity: true)
+    }
+}
+
+struct CpuTracer {
+    var cpu = ToyCpu(0, 0, 0, [])
+    var blacklist = Set<ToyCpu.State>()
+    var whitelist: [ToyCpu.State: Int] = [:]
+    
+    mutating func check(_ regA: Int) -> Bool {
+        cpu.reset()
+        cpu.state.regA = regA
+        var currentStates = [cpu.state: 0]
+        var whitelistLen = 0
+        while let (opcode, operand) = try! cpu.readInstruction() {
+            whitelistLen = 0
+            if blacklist.contains(cpu.state) {
+                return false
+            }
+            if let len = whitelist[cpu.state] {
+                cpu.progOutput += cpu.program.suffix(len)
+                whitelistLen = len
+                break
+            }
+            try! cpu.execute(opcode, operand)
+            currentStates[cpu.state] = cpu.progOutput.count
+        }
+        if cpu.progOutput.elementsEqual(cpu.program.suffix(cpu.progOutput.count))  {
+            for (state, currentLen) in currentStates {
+                whitelist[state] = currentLen + whitelistLen
+            }
+            return true
+        } else {
+            blacklist.formUnion(currentStates.keys)
+            return false
+        }
     }
 }
 
@@ -137,19 +166,37 @@ var cpu = try parse(String(contentsOfFile: "input", encoding: .ascii))
 try cpu.run()
 print(cpu.progOutput.map({String($0)}).joined(separator: ","))
 
-//var regA = -1
-//print(cpu.program)
-//while true {
-//    regA += 1
-//    cpu.reset()
-//    cpu.state.regA = regA
-//    do {
-//        if try cpu.runCheck() {
-//            print(regA)
-//            print(cpu.progOutput)
-//            break
-//        }
-//    } catch CpuError.invalidOperand {
-//        continue
-//    }
-//}
+var regA = 0
+
+while true {
+    for igrp in 0..<16 {
+        let grp = 15 - igrp
+        let a = 1 << (grp * 3)
+        print(grp)
+        for i in 0...1023 {
+            let tmp = regA + a * i
+            cpu.reset()
+            cpu.state.regA = tmp
+            try! cpu.run()
+            print("\(tmp): \(cpu.progOutput)")
+            if cpu.progOutput.count > cpu.program.count {
+                break
+            }
+            if igrp > 0 && cpu.progOutput.suffix(igrp) != cpu.program.suffix(igrp) {
+                regA = tmp
+                break
+            }
+            if cpu.progOutput.count == cpu.program.count && cpu.progOutput[grp] == cpu.program[grp] {
+                regA = tmp
+                break
+            }
+        }
+    }
+    if cpu.progOutput.count > cpu.program.count {
+        break
+    }
+    if cpu.progOutput == cpu.program {
+        break
+    }
+}
+print(cpu.program)
