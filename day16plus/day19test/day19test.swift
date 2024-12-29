@@ -43,13 +43,13 @@ struct day19test {
                       "bwurrg",
                       "brgr"])
     func matchPositive(_ pattern: String) throws {
-        let checker = try PatternChecker(blocks)
-        #expect(checker.matching(pattern))
+        var checker = try PatternChecker(blocks)
+        #expect(checker.matching(pattern) != 0)
     }
     @Test(arguments: ["ubwu",
                       "bbrgwb"])
     func matchNegative(_ pattern: String) throws {
-        let checker = try PatternChecker(blocks)
-        #expect(checker.matching(pattern) == false)
+        var checker = try PatternChecker(blocks)
+        #expect(checker.matching(pattern) == 0)
     }
 }
