@@ -12,6 +12,10 @@ struct Blueprint<T: Hashable> {
     let start: T
 }
 
+enum InvalidData: Error {
+    case missingMapEntry
+}
+
 enum Command: String {
     case up = "^"
     case down = "v"
@@ -20,93 +24,151 @@ enum Command: String {
     case act = "A"
 }
 
-struct Action<T: Hashable>: Hashable {
-    let previous: T
-    let current: T
-    init(_ from: T, _ to: T) {
-        previous = from
-        current = to
-    }
+func makeCommands(from move: Vector2D) -> (Repeated<Command>, Repeated<Command>) {
+    let hCmd = move.x < 0 ? Command.left : .right
+    let vCmd = move.y < 0 ? Command.up : .down
+    let hDist = abs(move.x)
+    let vDist = abs(move.y)
+    return (
+        repeatElement(hCmd, count: hDist),
+        repeatElement(vCmd, count: vDist))
 }
 
-func makeActions<T: Hashable>(start: T, _ seq: any Sequence<T>) -> [Action<T>] {
-    let result = seq.reduce((start, []), {
-        prev, value in
-        (value, prev.1 + [Action(prev.0, value)])}).1
-    return result
-}
-
-struct Translator<T: Hashable> {
-    let map: [Action<T>: any Sequence<Command>]
-    let start: T
+struct Strategy {
+    var predefined: [Vector2D: [Repeated<Command>]] = [:]
+    let activate = repeatElement(Command.act, count: 1)
     
-    func translate(_ input: any Sequence<T>) -> any Sequence<Command> {
-        let actions: any Sequence<Action<T>> = makeActions(start: start, input)
-        let result: [any Sequence<Command>] = actions.compactMap({map[$0]})
-        return result.map({AnySequence($0)}).joined()
+    func horizontalFirst(_ commands: (Repeated<Command>, Repeated<Command>)) -> Output {
+        let (hCmds, vCmds) = commands
+        return [ hCmds, vCmds, activate ]
     }
+    
+    func verticalFirst(_ commands: (Repeated<Command>, Repeated<Command>)) -> Output {
+        let (hCmds, vCmds) = commands
+        return [ vCmds, hCmds, activate ]
+    }
+
+    func translate(move: Vector2D) -> Output {
+        if let commands = predefined[move] {
+            return commands
+        }
+        let commands = makeCommands(from: move)
+        if move.x > 0 {
+            return verticalFirst(commands)
+        }
+        return horizontalFirst(commands)
+    }
+    typealias Output = [Repeated<Command>]
 }
 
-func makeTranslator<T: Hashable>(map: [T: Vector2D], dead: Vector2D, start: T) -> Translator<T>{
-    var outMap: [Action<T>: any Sequence<Command>] = [:]
-    for (k1, p1) in map {
-        for (k2, p2) in map {
-            let action = Action(k1, k2)
-            let move = p2 + (-p1)
-            let vCmd = move.y < 0 ? Command.up : Command.down
-            let hCmd = move.x < 0 ? Command.left : Command.right
-            let vRep = abs(move.y)
-            let hRep = abs(move.x)
-            let commands = hCmd == .left && p1.y == dead.y && p2.x == dead.x ?
-                            [repeatElement(vCmd, count: vRep),
-                            repeatElement(hCmd, count: hRep),
-                             repeatElement(.act, count: 1)] :
-                            [repeatElement(hCmd, count: hRep),
-                             repeatElement(vCmd, count: vRep),
-                             repeatElement(.act, count: 1)]
-            outMap[action] = commands.joined()
+protocol TranslatorProtocol {
+    associatedtype InputElement: Hashable
+    associatedtype Output: Sequence<Command>
+    var strategy: Strategy {get set}
+    
+    func translate<S: Sequence<InputElement>>(input: S) throws -> Output
+}
+
+struct Translator<T: Hashable>: TranslatorProtocol {
+    let map: [T: Vector2D]
+    let start: T
+    let forbidden: Vector2D
+    let activate = repeatElement(Command.act, count: 1)
+    var strategy = Strategy()
+    
+    func translate<S: Sequence<T>>(input: S) throws -> Output {
+        guard let firstPos = map[start] else {throw InvalidData.missingMapEntry}
+        let positions = try input.map { element in
+            guard let pos = map[element] else {throw InvalidData.missingMapEntry}
+            return pos
+        }
+        let moves: [Repeated<Command>] = positions.reduce((firstPos, []), {
+            acc, pos in
+            let (previous, lst) = acc
+            let move = pos + (-previous)
+            if previous.x == forbidden.x && pos.y == forbidden.y {
+                let (hCmds, vCmds) = makeCommands(from: move)
+                return (pos, lst + [hCmds, vCmds, activate])
+            } else if previous.y == forbidden.y && pos.x == forbidden.x {
+                let (hCmds, vCmds) = makeCommands(from: move)
+                return (pos, lst + [vCmds, hCmds, activate])
+            } else {
+                return (pos, lst + strategy.translate(move: move))
+            }
+        }).1
+        
+        return moves.joined()
+    }
+    
+    typealias InputElement = T
+    typealias Output = FlattenSequence<Strategy.Output>
+}
+
+struct TranslatorPipe<T1: TranslatorProtocol, T2: TranslatorProtocol>: TranslatorProtocol
+where T2.InputElement == Command {
+    var leftSide: T1
+    var rightSide: T2
+    var strategy: Strategy {
+        get { leftSide.strategy }
+        set {
+            leftSide.strategy = newValue
+            rightSide.strategy = newValue
         }
     }
-    return Translator(map: outMap, start: start)
-}
-
-func |<T: Hashable>(leftSide: Translator<T>, rightSide: Translator<Command>) -> Translator<T> {
-    let newMap = leftSide.map.reduce(into: [Action<T>: any Sequence<Command>]()) {
-        acc, kv in
-        let (key, value) = kv
-        acc[key] = rightSide.translate(value)
+    
+    func translate<S: Sequence<T1.InputElement>>(input: S) throws -> T2.Output {
+        let leftResult = try leftSide.translate(input: input)
+        return try rightSide.translate(input: leftResult)
     }
-    return Translator(map: newMap, start: leftSide.start)
+    
+    typealias InputElement = T1.InputElement
+    typealias Output = T2.Output
 }
 
-let keypadMap: [Character: Vector2D] = [
-    "7": Vector2D(0, 0),
-    "8": Vector2D(1, 0),
-    "9": Vector2D(2, 0),
-    "4": Vector2D(0, 1),
-    "5": Vector2D(1, 1),
-    "6": Vector2D(2, 1),
-    "1": Vector2D(0, 2),
-    "2": Vector2D(1, 2),
-    "3": Vector2D(2, 2),
-    "0": Vector2D(1, 3),
-    "A": Vector2D(2, 3)
-]
+func |<T1: TranslatorProtocol, T2: TranslatorProtocol>(leftSide: T1, rightSide: T2) ->
+    TranslatorPipe<T1, T2>
+where T2.InputElement == Command {
+    return TranslatorPipe(leftSide: leftSide, rightSide: rightSide)
+}
 
-let panelMap: [Command: Vector2D] = [
-    .up: Vector2D(1, 0),
-    .act: Vector2D(2, 0),
-    .left: Vector2D(0, 1),
-    .down: Vector2D(1, 1),
-    .right: Vector2D(2, 1)
-]
+struct System {
+    let keypadMap: [Character: Vector2D] = [
+        "7": Vector2D(0, 0),
+        "8": Vector2D(1, 0),
+        "9": Vector2D(2, 0),
+        "4": Vector2D(0, 1),
+        "5": Vector2D(1, 1),
+        "6": Vector2D(2, 1),
+        "1": Vector2D(0, 2),
+        "2": Vector2D(1, 2),
+        "3": Vector2D(2, 2),
+        "0": Vector2D(1, 3),
+        "A": Vector2D(2, 3)
+    ]
+    
+    let panelMap: [Command: Vector2D] = [
+        .up: Vector2D(1, 0),
+        .act: Vector2D(2, 0),
+        .left: Vector2D(0, 1),
+        .down: Vector2D(1, 1),
+        .right: Vector2D(2, 1)
+    ]
+    
+    let keypad: Translator<Character>
+    let robot: Translator<Command>
+    var system: TranslatorPipe<TranslatorPipe<Translator<Character>, Translator<Command>>, Translator<Command>>
+    
+    init() {
+        keypad = Translator(map: keypadMap, start: "A", forbidden: Vector2D(0, 3))
+        robot = Translator(map: panelMap, start: .act, forbidden: Vector2D(0, 0))
+        system = keypad | robot | robot
+    }
+}
 
-let keypad = makeTranslator(map: keypadMap, dead: Vector2D(0, 3), start: "A")
-let panel = makeTranslator(map: panelMap, dead: Vector2D(0, 0), start: .act)
+let system = System()
+let codes = try String(contentsOfFile: "input", encoding: .ascii).split(whereSeparator: \.isNewline)
+let result = try codes.map({
+    try system.system.translate(input: $0).count * Int($0.dropLast())!
+}).reduce(0, (+))
 
-let myPanel = keypad | panel | panel
-
-let result = myPanel.translate("379A")
-print(result.count(where: {_ in true}))
-
-print(result.map(\.rawValue).joined())
+print(result)
