@@ -47,3 +47,22 @@ func scan2d(_ data: String, with function: (Int, Int, Character) -> Void) {
         }
     }
 }
+
+struct Pair<T1, T2> {
+    let first: T1
+    let second: T2
+    init(_ first: T1, _ second: T2) {
+        self.first = first
+        self.second = second
+    }
+}
+
+extension Pair: Equatable where T1: Equatable, T2: Equatable {
+}
+
+extension Pair: Hashable where T1: Hashable, T2: Hashable {
+}
+
+func pairwise<T>(_ src: some Sequence<T>) -> [Pair<T, T>] {
+    return zip(src, src.dropFirst()).map{Pair($0.0, $0.1)}
+}

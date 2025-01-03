@@ -24,15 +24,6 @@ enum Command: String {
     case act = "A"
 }
 
-struct Pair<T: Hashable>: Hashable {
-    let first: T
-    let second: T
-    init(_ first: T, _ second: T) {
-        self.first = first
-        self.second = second
-    }
-}
-
 func makeCommands(from move: Vector2D) -> (Repeated<Command>, Repeated<Command>) {
     let hCmd = move.x < 0 ? Command.left : .right
     let vCmd = move.y < 0 ? Command.up : .down
@@ -78,15 +69,6 @@ protocol TranslatorProtocol {
     func translate<S: Sequence<InputElement>>(input: S) throws -> Output
 }
 
-func pairwise<S: Sequence>(first: S.Element, _ src: S) -> [Pair<S.Element>] where S.Element: Hashable {
-    var current = first
-    var result = [Pair<S.Element>]()
-    for element in src {
-        result.append(Pair(current, element))
-        current = element
-    }
-    return result
-}
 
 struct Translator<T: Hashable>: TranslatorProtocol {
     let map: [T: Vector2D]
@@ -119,7 +101,7 @@ struct Translator<T: Hashable>: TranslatorProtocol {
         return moves.joined()
     }
     
-    func translateMove(_ pair: Pair<T>) throws -> Output {
+    func translateMove(_ pair: Pair<T, T>) throws -> Output {
         guard let p1 = map[pair.first],
               let p2 = map[pair.second]
         else { throw InvalidData.missingMapEntry }
@@ -200,8 +182,8 @@ struct System {
     
     func translate2(input: Substring, count: Int) throws -> Int {
         let robotCommands = try keypad.translate(input: input)
-        var cache = [Pair<Command>: Int]()
-        for pair in pairwise(first: robot.start, robotCommands) {
+        var cache = [Pair<Command, Command>: Int]()
+        for pair in pairwise([robot.start] + robotCommands) {
             cache[pair, default: 0] += 1
         }
         for (pair, count) in cache {
@@ -213,7 +195,7 @@ struct System {
             cache.removeAll(keepingCapacity: true)
             for (pair, cnt) in pairCnts {
                 let commands = try robot.translateMove(pair)
-                for cmdPair in pairwise(first: robot.start, commands) {
+                for cmdPair in pairwise([robot.start] + commands) {
                     cache[cmdPair, default: 0] += cnt
                 }
             }
