@@ -24,6 +24,15 @@ enum Command: String {
     case act = "A"
 }
 
+struct Pair<T: Hashable>: Hashable {
+    let first: T
+    let second: T
+    init(_ first: T, _ second: T) {
+        self.first = first
+        self.second = second
+    }
+}
+
 func makeCommands(from move: Vector2D) -> (Repeated<Command>, Repeated<Command>) {
     let hCmd = move.x < 0 ? Command.left : .right
     let vCmd = move.y < 0 ? Command.up : .down
@@ -69,6 +78,16 @@ protocol TranslatorProtocol {
     func translate<S: Sequence<InputElement>>(input: S) throws -> Output
 }
 
+func pairwise<S: Sequence>(first: S.Element, _ src: S) -> [Pair<S.Element>] where S.Element: Hashable {
+    var current = first
+    var result = [Pair<S.Element>]()
+    for element in src {
+        result.append(Pair(current, element))
+        current = element
+    }
+    return result
+}
+
 struct Translator<T: Hashable>: TranslatorProtocol {
     let map: [T: Vector2D]
     let start: T
@@ -98,6 +117,27 @@ struct Translator<T: Hashable>: TranslatorProtocol {
         }).1
         
         return moves.joined()
+    }
+    
+    func translateMove(_ pair: Pair<T>) throws -> Output {
+        guard let p1 = map[pair.first],
+              let p2 = map[pair.second]
+        else { throw InvalidData.missingMapEntry }
+        
+        var result = Strategy.Output()
+        let move = p2 + (-p1)
+        
+        if p1.x == forbidden.x && p2.y == forbidden.y {
+            let commands = makeCommands(from: move)
+            result += strategy.horizontalFirst(commands)
+        } else if p1.y == forbidden.y && p2.x == forbidden.x {
+            let commands = makeCommands(from: move)
+            result += strategy.verticalFirst(commands)
+        } else {
+            result += strategy.translate(move: move)
+        }
+
+        return result.joined()
     }
     
     typealias InputElement = T
@@ -158,6 +198,31 @@ struct System {
     let robot: Translator<Command>
     var system: TranslatorPipe<TranslatorPipe<Translator<Character>, Translator<Command>>, Translator<Command>>
     
+    func translate2(input: Substring, count: Int) throws -> Int {
+        let robotCommands = try keypad.translate(input: input)
+        var cache = [Pair<Command>: Int]()
+        for pair in pairwise(first: robot.start, robotCommands) {
+            cache[pair, default: 0] += 1
+        }
+        for (pair, count) in cache {
+            print(pair.first, pair.second, count)
+        }
+        for _ in 0..<count {
+            print(cache.values.reduce(0, (+)))
+            let pairCnts = Array(cache)
+            cache.removeAll(keepingCapacity: true)
+            for (pair, cnt) in pairCnts {
+                let commands = try robot.translateMove(pair)
+                for cmdPair in pairwise(first: robot.start, commands) {
+                    cache[cmdPair, default: 0] += cnt
+                }
+            }
+        }
+        let result = cache.values.reduce(0, (+))
+        print(result)
+        return result
+    }
+    
     init() {
         keypad = Translator(map: keypadMap, start: "A", forbidden: Vector2D(0, 3))
         robot = Translator(map: panelMap, start: .act, forbidden: Vector2D(0, 0))
@@ -171,4 +236,8 @@ let result = try codes.map({
     try system.system.translate(input: $0).count * Int($0.dropLast())!
 }).reduce(0, (+))
 
-print(result)
+let result2 = try codes.map({
+    try system.translate2(input: $0, count: 25) * Int($0.dropLast())!
+}).reduce(0, (+))
+
+print(result, result2)
