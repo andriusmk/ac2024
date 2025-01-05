@@ -64,6 +64,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6962CCB42D2B0FC300F656FD /* utils_test.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = utils_test.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		697466202D2259D4009260AB /* day21 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = day21; sourceTree = BUILT_PRODUCTS_DIR; };
 		6974662D2D230A39009260AB /* day21test.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = day21test.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		697659D02D14875500A06823 /* day16 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = day16; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -79,6 +80,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6962CCBC2D2B0FCE00F656FD /* Exceptions for "lib" folder in "utils_test" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				utils.swift,
+			);
+			target = 6962CCB32D2B0FC300F656FD /* utils_test */;
+		};
 		697466282D2259F9009260AB /* Exceptions for "lib" folder in "day21" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -235,6 +243,11 @@
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		6962CCB52D2B0FC300F656FD /* utils_test */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = utils_test;
+			sourceTree = "<group>";
+		};
 		697466212D2259D4009260AB /* day21 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -273,6 +286,7 @@
 				698EFE492D206C18005CA6B2 /* Exceptions for "lib" folder in "day18test" target */,
 				697466372D230A60009260AB /* Exceptions for "lib" folder in "day21test" target */,
 				69D367482D286311005D33A7 /* Exceptions for "lib" folder in "Day20test" target */,
+				6962CCBC2D2B0FCE00F656FD /* Exceptions for "lib" folder in "utils_test" target */,
 			);
 			path = lib;
 			sourceTree = "<group>";
@@ -338,6 +352,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6962CCB12D2B0FC300F656FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6974661D2D2259D4009260AB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -441,6 +462,7 @@
 				6974662E2D230A39009260AB /* day21test */,
 				69D366C02D284C42005D33A7 /* Day20 */,
 				69D367062D28614C005D33A7 /* Day20test */,
+				6962CCB52D2B0FC300F656FD /* utils_test */,
 				697659D12D14875500A06823 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -460,6 +482,7 @@
 				6974662D2D230A39009260AB /* day21test.xctest */,
 				69D366BF2D284C42005D33A7 /* Day20 */,
 				69D367052D28614C005D33A7 /* Day20test.xctest */,
+				6962CCB42D2B0FC300F656FD /* utils_test.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -467,6 +490,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		6962CCB32D2B0FC300F656FD /* utils_test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6962CCBA2D2B0FC300F656FD /* Build configuration list for PBXNativeTarget "utils_test" */;
+			buildPhases = (
+				6962CCB02D2B0FC300F656FD /* Sources */,
+				6962CCB12D2B0FC300F656FD /* Frameworks */,
+				6962CCB22D2B0FC300F656FD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				6962CCB52D2B0FC300F656FD /* utils_test */,
+			);
+			name = utils_test;
+			packageProductDependencies = (
+			);
+			productName = utils_test;
+			productReference = 6962CCB42D2B0FC300F656FD /* utils_test.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		6974661F2D2259D4009260AB /* day21 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 697466262D2259D4009260AB /* Build configuration list for PBXNativeTarget "day21" */;
@@ -740,6 +785,9 @@
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					6962CCB32D2B0FC300F656FD = {
+						CreatedOnToolsVersion = 16.2;
+					};
 					6974661F2D2259D4009260AB = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -804,11 +852,19 @@
 				698EFE5D2D2127E6005CA6B2 /* day19test */,
 				6974662C2D230A39009260AB /* day21test */,
 				69D367042D28614C005D33A7 /* Day20test */,
+				6962CCB32D2B0FC300F656FD /* utils_test */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		6962CCB22D2B0FC300F656FD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6974662B2D230A39009260AB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -854,6 +910,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6962CCB02D2B0FC300F656FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6974661C2D2259D4009260AB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -941,6 +1004,36 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		6962CCB82D2B0FC300F656FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P2L2J3C77B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "None.utils-test";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6962CCB92D2B0FC300F656FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P2L2J3C77B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "None.utils-test";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		697466242D2259D4009260AB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1374,6 +1467,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6962CCBA2D2B0FC300F656FD /* Build configuration list for PBXNativeTarget "utils_test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6962CCB82D2B0FC300F656FD /* Debug */,
+				6962CCB92D2B0FC300F656FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		697466262D2259D4009260AB /* Build configuration list for PBXNativeTarget "day21" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

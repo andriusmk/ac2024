@@ -66,3 +66,26 @@ extension Pair: Hashable where T1: Hashable, T2: Hashable {
 func pairwise<T>(_ src: some Sequence<T>) -> [Pair<T, T>] {
     return zip(src, src.dropFirst()).map{Pair($0.0, $0.1)}
 }
+
+func modInverse(a a0: Int, mod m0: Int) -> Int {
+    var a = a0
+    var mod = m0
+    var y = 0
+    var x = 1
+    
+    if mod == 1 {
+        return 0
+    }
+    
+    while a > 1 {
+        let quot = a / mod
+        (a, mod) = (mod, a % mod)
+        (x, y) = (y, x - quot * y)
+    }
+    
+    if x < 0 {
+        x += m0
+    }
+    
+    return x
+}
